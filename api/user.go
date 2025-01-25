@@ -1,11 +1,11 @@
 package api
 
 import (
-	db "bill_split/db/sqlc"
-	"bill_split/util"
-	"bill_split/worker"
 	"database/sql"
 	"net/http"
+	db "simple_bank/db/sqlc"
+	"simple_bank/util"
+	"simple_bank/worker"
 	"time"
 
 	"github.com/gin-gonic/gin"

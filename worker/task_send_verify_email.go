@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	db "bill_split/db/sqlc"
+	db "simple_bank/db/sqlc"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/hibiken/asynq"

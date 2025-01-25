@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	"bill_split/api"
-	"bill_split/config"
-	db "bill_split/db/sqlc"
-	"bill_split/mail"
-	"bill_split/worker"
+	"simple_bank/api"
+	"simple_bank/config"
+	db "simple_bank/db/sqlc"
+	"simple_bank/mail"
+	"simple_bank/worker"
 
 	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"

@@ -1,10 +1,10 @@
 package api
 
 import (
-	"bill_split/token"
 	"errors"
 	"fmt"
 	"net/http"
+	"simple_bank/token"
 	"strings"
 
 	"github.com/gin-gonic/gin"

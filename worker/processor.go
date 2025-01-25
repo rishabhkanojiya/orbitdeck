@@ -1,9 +1,9 @@
 package worker
 
 import (
-	db "bill_split/db/sqlc"
-	"bill_split/mail"
 	"context"
+	db "simple_bank/db/sqlc"
+	"simple_bank/mail"
 
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"

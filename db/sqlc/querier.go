@@ -6,24 +6,29 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
-	AddMemberToGroup(ctx context.Context, arg AddMemberToGroupParams) error
-	CreateExpense(ctx context.Context, arg CreateExpenseParams) (Expense, error)
-	CreateGroup(ctx context.Context, name string) (Group, error)
-	CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error)
-	DeleteExpense(ctx context.Context, id int32) error
-	DeleteGroup(ctx context.Context, id int32) error
-	DeleteMember(ctx context.Context, id int32) error
-	GetExpensesByGroup(ctx context.Context, groupID int32) ([]Expense, error)
-	GetGroupByID(ctx context.Context, id int32) (Group, error)
-	GetMemberByID(ctx context.Context, id int32) (Member, error)
-	GetMembersByGroup(ctx context.Context, groupID int32) ([]GetMembersByGroupRow, error)
-	RemoveMemberFromGroup(ctx context.Context, arg RemoveMemberFromGroupParams) error
-	UpdateExpense(ctx context.Context, arg UpdateExpenseParams) error
-	UpdateGroup(ctx context.Context, arg UpdateGroupParams) error
-	UpdateMember(ctx context.Context, arg UpdateMemberParams) error
+	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Account, error)
+	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
+	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
+	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
+	DeleteAccount(ctx context.Context, id int64) error
+	GetAccount(ctx context.Context, id int64) (Account, error)
+	GetAccountForUpdate(ctx context.Context, id int64) (Account, error)
+	GetEntry(ctx context.Context, id int64) (Entry, error)
+	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
+	GetTransfer(ctx context.Context, id int64) (Transfer, error)
+	GetUser(ctx context.Context, username string) (User, error)
+	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
+	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
+	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
+	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
 }
 
 var _ Querier = (*Queries)(nil)

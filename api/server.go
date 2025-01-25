@@ -1,11 +1,11 @@
 package api
 
 import (
-	"bill_split/config"
-	db "bill_split/db/sqlc"
-	"bill_split/token"
-	"bill_split/worker"
 	"fmt"
+	"simple_bank/config"
+	db "simple_bank/db/sqlc"
+	"simple_bank/token"
+	"simple_bank/worker"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

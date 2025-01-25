@@ -1,7 +1,7 @@
 package api
 
 import (
-	"bill_split/util"
+	"simple_bank/util"
 
 	"github.com/go-playground/validator/v10"
 )

@@ -1,12 +1,12 @@
 package api
 
 import (
-	db "bill_split/db/sqlc"
-	"bill_split/token"
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
+	db "simple_bank/db/sqlc"
+	"simple_bank/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"

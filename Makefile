@@ -1,10 +1,10 @@
-DB_URL=postgresql://root:root@localhost:5432/bill_split?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5432/simple_bank?sslmode=disable
 
 createdb:
-	createdb --username=root --owner=root bill_split
+	createdb --username=root --owner=root simple_bank
 
 dropdb:
-	dropdb --username=root bill_split
+	dropdb --username=root simple_bank
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
@@ -33,8 +33,8 @@ server:
 	clear && go run main.go
 
 mock:
-	mockgen -package mock_db -destination db/mock/store.go bill_split/db/sqlc Store
-	mockgen -package mock_wk -destination worker/mock/distributor.go bill_split/worker TaskDistributor
+	mockgen -package mock_db -destination db/mock/store.go simple_bank/db/sqlc Store
+	mockgen -package mock_wk -destination worker/mock/distributor.go simple_bank/worker TaskDistributor
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
