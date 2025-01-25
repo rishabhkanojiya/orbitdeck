@@ -1,7 +1,7 @@
 package api
 
 import (
-	"controlcore/util"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/util"
 
 	"github.com/go-playground/validator/v10"
 )

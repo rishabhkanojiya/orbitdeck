@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	"controlcore/api"
-	"controlcore/config"
-	db "controlcore/db/sqlc"
-	"controlcore/mail"
-	"controlcore/worker"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/api"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/config"
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/mail"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/worker"
 
 	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"

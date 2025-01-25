@@ -4,8 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"controlcore/token"
 	"strings"
+
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 
 	"github.com/gin-gonic/gin"
 )

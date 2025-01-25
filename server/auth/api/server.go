@@ -1,11 +1,12 @@
 package api
 
 import (
-	"controlcore/config"
-	db "controlcore/db/sqlc"
-	"controlcore/token"
-	"controlcore/worker"
 	"fmt"
+
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/config"
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/worker"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

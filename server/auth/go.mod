@@ -1,4 +1,4 @@
-module controlcore
+module github.com/rishabhkanojiya/orbitdeck/server/authcontrolcore
 
 go 1.23.3
 

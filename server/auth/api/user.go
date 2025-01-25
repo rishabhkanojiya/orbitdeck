@@ -3,10 +3,11 @@ package api
 import (
 	"database/sql"
 	"net/http"
-	db "controlcore/db/sqlc"
-	"controlcore/util"
-	"controlcore/worker"
 	"time"
+
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/util"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/worker"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

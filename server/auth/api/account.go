@@ -1,12 +1,13 @@
 package api
 
 import (
-	db "controlcore/db/sqlc"
-	"controlcore/token"
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
+
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"

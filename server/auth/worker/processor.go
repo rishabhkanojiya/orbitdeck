@@ -2,8 +2,9 @@ package worker
 
 import (
 	"context"
-	db "controlcore/db/sqlc"
-	"controlcore/mail"
+
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/mail"
 
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"

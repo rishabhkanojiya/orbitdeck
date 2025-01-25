@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	db "controlcore/db/sqlc"
+	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/hibiken/asynq"
