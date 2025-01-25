@@ -24,17 +24,8 @@ new_migration:
 sqlc:
 	sqlc generate
 
-test:
-	make migratedown
-	make migrateup
-	go test -v -cover ./...
-
 server:
 	clear && go run main.go
-
-mock:
-	mockgen -package mock_db -destination db/mock/store.go simple_bank/db/sqlc Store
-	mockgen -package mock_wk -destination worker/mock/distributor.go simple_bank/worker TaskDistributor
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine

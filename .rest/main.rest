@@ -43,7 +43,7 @@ Content-Type: {{contentType}}
 
 
 ###
-GET http://{{host}}/accounts/74
+GET http://{{host}}/accounts/19
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
 
