@@ -1,7 +1,7 @@
 package api
 
 import (
-	"simple_bank/util"
+	"controlcore/util"
 
 	"github.com/go-playground/validator/v10"
 )

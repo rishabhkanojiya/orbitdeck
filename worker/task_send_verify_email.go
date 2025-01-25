@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	db "simple_bank/db/sqlc"
+	db "controlcore/db/sqlc"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/hibiken/asynq"

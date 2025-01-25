@@ -1,11 +1,11 @@
 package api
 
 import (
+	"controlcore/config"
+	db "controlcore/db/sqlc"
+	"controlcore/token"
+	"controlcore/worker"
 	"fmt"
-	"simple_bank/config"
-	db "simple_bank/db/sqlc"
-	"simple_bank/token"
-	"simple_bank/worker"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

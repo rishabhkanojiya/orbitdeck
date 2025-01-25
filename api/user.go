@@ -3,9 +3,9 @@ package api
 import (
 	"database/sql"
 	"net/http"
-	db "simple_bank/db/sqlc"
-	"simple_bank/util"
-	"simple_bank/worker"
+	db "controlcore/db/sqlc"
+	"controlcore/util"
+	"controlcore/worker"
 	"time"
 
 	"github.com/gin-gonic/gin"

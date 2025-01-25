@@ -2,8 +2,8 @@ package worker
 
 import (
 	"context"
-	db "simple_bank/db/sqlc"
-	"simple_bank/mail"
+	db "controlcore/db/sqlc"
+	"controlcore/mail"
 
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"

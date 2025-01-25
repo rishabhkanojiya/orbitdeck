@@ -1,12 +1,12 @@
 package api
 
 import (
+	db "controlcore/db/sqlc"
+	"controlcore/token"
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
-	db "simple_bank/db/sqlc"
-	"simple_bank/token"
 
 	"github.com/gin-gonic/gin"
 )

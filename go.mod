@@ -1,4 +1,4 @@
-module simple_bank
+module controlcore
 
 go 1.23.3
 

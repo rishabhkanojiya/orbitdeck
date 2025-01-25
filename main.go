@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	"simple_bank/api"
-	"simple_bank/config"
-	db "simple_bank/db/sqlc"
-	"simple_bank/mail"
-	"simple_bank/worker"
+	"controlcore/api"
+	"controlcore/config"
+	db "controlcore/db/sqlc"
+	"controlcore/mail"
+	"controlcore/worker"
 
 	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"

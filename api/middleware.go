@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"simple_bank/token"
+	"controlcore/token"
 	"strings"
 
 	"github.com/gin-gonic/gin"
