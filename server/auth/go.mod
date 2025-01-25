@@ -1,4 +1,4 @@
-module github.com/rishabhkanojiya/orbitdeck/server/authcontrolcore
+module github.com/rishabhkanojiya/orbitdeck/server/auth
 
 go 1.23.3
 
@@ -16,7 +16,6 @@ require (
 	github.com/o1egl/paseto v1.0.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/viper v1.19.0
-	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.29.0
 )
 
