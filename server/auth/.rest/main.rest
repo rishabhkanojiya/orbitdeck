@@ -37,26 +37,6 @@ POST http://{{host}}/tokens/renew_access
 Content-Type: {{contentType}}
 
 {
-    "refresh_token": "v2.local.mUW-aUOUVd_5GjOqnelTv-ZccNADU_h3HLLXQvP2AiCPTyfF0J6igL2r-NNniskWxWThU-3j6Na6gqAcNYoot2zo0agiGuxxoHmidrumxnySqGvkpOlxMQbjqyiXu-meDzl8T2MXMwbuJaQj-zjC9eomGdZJip66w1sx7ktnHF8BZfO2vIhG--n8XS4LaXL5KElJGrV1ptCcfeR-EaM4VQ0kT-FIi4XD14GAgotee4cv4h0FUU63XGgT3l7dgemlSA5zqgvC.bnVsbA"
+    "refresh_token": "v2.local.0h_XJXCQCpmBXrP67US5c_n980t3Qw2yWp4OHHq7rZQ7ZMBW4QzhVAWMyRRY8A19YQMN7viXHV3DnaAAdxD9W6pfSCcAYImeYK0DOX4r_yHpVl6XmsWMxr2-mrnfK_z8vhX3VVJb7AppuIheYhwZJKV_ke98TR-WS3Z0g39mWR3JnQXETZX9RqclQlvsO1qG9F-pPjeLCZbxXTGP9Gu6FV_Xf_4-4V0MupcJMGApEOtT4S_sJ0yQbmgqXMhGWlsESVj0urdp0g.bnVsbA"
 }
 
-
-
-###
-GET http://{{host}}/accounts/1
-Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
-
-###
-POST http://{{host}}/accounts
-Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
-
-{
-    "currency": "CAD"
-}
-
-###
-GET http://{{host}}/accounts?page_id=1&page_size=5
-Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
