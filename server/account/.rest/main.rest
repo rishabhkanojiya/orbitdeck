@@ -1,10 +1,23 @@
 @hostname = localhost
-@port1 = 6969
-@port = 6970
+@port1 = 8080
+@port = 8081
 # @host = templateapp.app/api/v1.0
 @host = {{hostname}}:{{port}}
 
 @contentType = application/json
+
+
+###
+# @name Register
+POST http://{{hostname}}:{{port1}}/users
+Content-Type: {{contentType}}
+
+{
+    "full_name":"Rishabh",
+    "username": "rk2",
+    "email": "rk2@flow.com",
+    "password": "Qwe@123456"
+}
 
 
 ###
@@ -13,7 +26,7 @@ POST http://{{hostname}}:{{port1}}/users/login
 Content-Type: {{contentType}}
 
 {
-    "username": "rk5",
+    "username": "rk2",
     "password": "Qwe@123456"
 }
 

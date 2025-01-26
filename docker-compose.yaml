@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+  postgres_auth:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=auth
+    ports:
+      - "5432:5432"
+  postgres_account:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=account
+    ports:
+      - "5431:5432"
+  redis:
+    image: redis:7-alpine
+  auth:
+    build:
+      context: ./server/auth
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_CONN=postgresql://root:secret@postgres_auth:5432/auth?sslmode=disable
+      - REDIS_ADDRESS=redis:6379
+      - SERVER_PORT=8080
+    depends_on:
+      - postgres_auth
+      - redis
+    entrypoint: ["/app/start.sh"]
+    command: ["/app/main"]
+  account:
+    build:
+      context: ./server/account
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_CONN=postgresql://root:secret@postgres_account:5432/account?sslmode=disable
+      - REDIS_ADDRESS=redis:6379
+      - SERVER_PORT=8081
+    depends_on:
+      - postgres_account
+      - redis
+    entrypoint: ["/app/start.sh"]
+    command: ["/app/main"]
+volumes:
+  data-volume:

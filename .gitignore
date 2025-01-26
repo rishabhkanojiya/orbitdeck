@@ -1,1 +1,3 @@
 account/*
+git_token
+**/.netrc
