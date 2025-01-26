@@ -7,7 +7,8 @@ import (
 	"net/http"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/account/db/sqlc"
-	"github.com/rishabhkanojiya/orbitdeck/server/account/token"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/api"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -24,7 +25,7 @@ func (server *Server) createAccount(ctx *gin.Context) {
 		return
 	}
 
-	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
 	args := db.CreateAccountParams{
 		Owner:    authPayload.Username,
 		Currency: req.Currency,
@@ -72,7 +73,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
-	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
 	if account.Owner != authPayload.Username {
 		err := errors.New("account doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
@@ -95,7 +96,7 @@ func (server *Server) getAccounts(ctx *gin.Context) {
 		return
 	}
 
-	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
 	args := db.ListAccountsParams{
 		Owner:  authPayload.Username,
 		Limit:  req.PageSize,

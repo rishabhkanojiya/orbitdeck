@@ -5,8 +5,9 @@ import (
 
 	"github.com/rishabhkanojiya/orbitdeck/server/account/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/account/db/sqlc"
-	"github.com/rishabhkanojiya/orbitdeck/server/account/token"
 	"github.com/rishabhkanojiya/orbitdeck/server/account/worker"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/api"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -47,16 +48,11 @@ func NewServer(config config.Config, store db.Store, taskDistributor worker.Task
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	router.POST("/users", server.createUser)
-	router.POST("/users/login", server.loginUser)
-	router.POST("/tokens/renew_access", server.renewAccessToken)
-
-	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes := router.Group("/").Use(api.AuthMiddleware(server.tokenMaker))
+	// authRoutes := router.Group("/")
 	authRoutes.POST("/accounts", server.createAccount)
 	authRoutes.GET("/accounts/:id", server.getAccount)
 	authRoutes.GET("/accounts", server.getAccounts)
-
-	authRoutes.POST("/transfers", server.createTransfer)
 
 	server.router = router
 }

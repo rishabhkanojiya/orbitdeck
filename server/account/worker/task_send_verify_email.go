@@ -5,9 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	db "github.com/rishabhkanojiya/orbitdeck/server/account/db/sqlc"
-
-	"github.com/brianvoe/gofakeit/v7"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -45,39 +42,20 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
 
-	user, err := processor.store.GetUser(ctx, payload.Username)
-	if err != nil {
-		// if err == sql.ErrNoRows {
-		// 	return fmt.Errorf("user doesn't exist: %w", asynq.SkipRetry)
-		// }
-		return fmt.Errorf("failed to get user: %w", err)
-	}
-
-	verifyEmail, err := processor.store.CreateVerifyEmail(ctx, db.CreateVerifyEmailParams{
-		Username:   user.Username,
-		Email:      user.Email,
-		SecretCode: gofakeit.UUID()[:32],
-	})
-
-	if err != nil {
-		return fmt.Errorf("failed to create verify email: %w", err)
-	}
-
 	subject := "Welcome to Simple Bank"
-	verifyUrl := fmt.Sprintf("http://simple-bank.org/verify_email?id=%d&secret_code=%s",
-		verifyEmail.ID, verifyEmail.SecretCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
 	Thank you for registering with us!<br/>
-	Please <a href="%s">click here</a> to verify your email address.<br/>
-	`, user.FullName, verifyUrl)
-	to := []string{user.Email}
+	Please  to verify your email address.<br/>
+	`, payload.Username)
 
-	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
+	to := []string{"testemail@gmail.com"}
+
+	err := processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("failed to send verify email: %w", err)
 	}
 
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).
-		Str("email", user.Email).Msg("processed task")
+		Str("email", to[0]).Msg("processed task")
 	return nil
 }

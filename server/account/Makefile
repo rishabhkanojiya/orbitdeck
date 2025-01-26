@@ -1,10 +1,10 @@
-DB_URL=postgresql://root:root@localhost:5432/controlcore?sslmode=disable
+DB_URL=postgresql://root:root@localhost:5432/account?sslmode=disable
 
 createdb:
-	createdb --username=root --owner=root controlcore
+	createdb --username=root --owner=root account
 
 dropdb:
-	dropdb --username=root controlcore
+	dropdb --username=root account
 
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
