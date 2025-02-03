@@ -1,11 +1,16 @@
 DB_URL=postgresql://root:root@localhost:5432/auth?sslmode=disable
 
+network:
+	docker network create bank-network
+
+postgres:
+	docker run --name postgres --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -d postgres:14-alpine
+
 createdb:
-	createdb --username=root --owner=root auth
+	docker exec -it postgres createdb --username=root --owner=root auth
 
 dropdb:
-	dropdb --username=root auth
-
+	docker exec -it postgres dropdb --username=root auth
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
