@@ -1,0 +1,126 @@
+COMPONENT_DEFINITION:
+  - &INTERNAL-POSTGRES
+    name: internal-postgres
+    replicaCount: 1
+    image:
+      repository: postgres:14.10-alpine3.19
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "db"
+      port: 5432
+    env:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "be-templateapp"
+    volume:
+      path: /var/lib/postgresql/data
+      subPath: postgres
+      claimName: postgres-pvc
+  - &EMAIL-REDIS
+    name: email-redis
+    replicaCount: 0
+    image:
+      repository: redis
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "caching"
+      port: 6379
+  - &USER
+    name: user
+    replicaCount: 0
+    image:
+      repository: rishabh75/templateapp-user
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+    env:
+      MODE: "server"
+      SERVER_TYPE: "USER"
+  - &EMAIL
+    name: email
+    replicaCount: 0
+    image:
+      repository: rishabh75/templateapp-email
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: "worker"
+      SERVER_TYPE: "email"
+      WORKER_TYPE: "email"
+      QUEUE_NAME: "EMAIL_WORKER_QUEUE_1"
+      WORKER_CONCURRENCY: "5"
+  - &PYTHON
+    name: python
+    replicaCount: 0
+    image:
+      repository: rishabh75/templateapp-python
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+
+jobs:
+  - name: internal-migration
+    completions: 1
+    backoffLimit: 1
+    enabled: true
+    image:
+      repository: rishabh75/templateapp-internal-migration
+      tag: latest
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: "server"
+      SERVER_TYPE: "internal"
+
+volumes:
+  - name: postgres
+    storage: 1Gi
+
+DEV_COMPONENTS: &DEV_COMPONENTS
+  - *INTERNAL-POSTGRES
+  - *EMAIL-REDIS
+  - *USER
+  - *EMAIL
+  - *PYTHON
+
+components: *DEV_COMPONENTS

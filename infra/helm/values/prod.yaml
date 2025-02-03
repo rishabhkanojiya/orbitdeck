@@ -1,0 +1,228 @@
+COMPONENT_DEFINITION:
+  - &INTERNAL-POSTGRES
+    name: internal-postgres
+    replicaCount: 1
+    image:
+      repository: postgres:14.10-alpine3.19
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "db"
+      port: 5432
+    env:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "be-templateapp"
+    volume:
+      path: /var/lib/postgresql/data
+      subPath: postgres
+      claimName: postgres-pvc
+  - &EMAIL-REDIS
+    name: email-redis
+    replicaCount: 1
+    image:
+      repository: redis
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "caching"
+      port: 6379
+  - &USER
+    name: user
+    replicaCount: 1
+    image:
+      repository: rishabh75/templateapp-user
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+    env:
+      MODE: "server"
+      SERVER_TYPE: "USER"
+  - &EMAIL
+    name: email
+    replicaCount: 1
+    image:
+      repository: rishabh75/templateapp-email
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: "worker"
+      SERVER_TYPE: "email"
+      WORKER_TYPE: "email"
+      QUEUE_NAME: "EMAIL_WORKER_QUEUE_1"
+      WORKER_CONCURRENCY: "5"
+  - &PYTHON
+    name: python
+    replicaCount: 1
+    image:
+      repository: rishabh75/templateapp-python
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+  - &CLIENT_PROD
+    name: client
+    replicaCount: 1
+    image:
+      repository: rishabh75/templateapp-client-prod
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1000Mi"
+      limits:
+        cpu: "1"
+        memory: "1000Mi"
+    service:
+      port: 3000
+    env:
+      API_URL: "https://templateapp.app/api/user"
+      # API_URL: "https://20.246.254.93/api/user" -> for server dev
+      ENV: "production"
+      PORT: 3000
+
+INGRESS_DEFINITION: &INGRESS_DEFINITION
+  - &PROD_INGRESS
+    ingressClassName: nginx
+    sslRedirect: true
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: /$1
+      cert-manager.io/cluster-issuer: "issuer-config"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    tls:
+      hosts:
+        - templateapp.app
+        - www.templateapp.app
+      secretName: templateapp-app
+    rules:
+      - host: templateapp.app
+        paths:
+          - path: /api/user/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: user-svc
+              servicePort: 9069
+          - path: /api/test/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: test-svc
+              servicePort: 9069
+          - path: /api/python/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: python-svc
+              servicePort: 9069
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: client-svc
+              servicePort: 3000
+      - host: www.templateapp.app
+        paths:
+          - path: /api/user/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: user-svc
+              servicePort: 9069
+          - path: /api/test/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: test-svc
+              servicePort: 9069
+          - path: /api/python/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: python-svc
+              servicePort: 9069
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: client-svc
+              servicePort: 3000
+
+jobs:
+  - name: postgres-migration
+    completions: 1
+    backoffLimit: 1
+    enabled: true
+    # hooks:
+    #   helm.sh/hook: pre-install,pre-upgrade
+    #   helm.sh/hook-weight: "0"
+    #   helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded,hook-failed
+    image:
+      repository: rishabh75/templateapp-internal-migration
+      tag: latest
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: "server"
+      SERVER_TYPE: "internal"
+
+volumes:
+  - name: postgres
+    storage: 1Gi
+
+cronJobs:
+  - name: email-cron-job
+    schedule: "*/30 * * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 1
+    concurrencyPolicy: "Forbid"
+    image: rishabh75/templateapp-email-cron
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+
+PROD_COMPONENTS: &PROD_COMPONENTS
+  - *INTERNAL-POSTGRES
+  - *EMAIL-REDIS
+  - *USER
+  - *EMAIL
+  - *PYTHON
+  - *CLIENT_PROD
+
+components: *PROD_COMPONENTS
+
+ingress: *PROD_INGRESS

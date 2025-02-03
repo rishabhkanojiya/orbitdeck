@@ -1,0 +1,92 @@
+# deployment-template
+
+{{- range .Values.components }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-deployment" .name }}
+  {{- if .hooks }}
+  annotations:
+    {{- range $key, $value := .hooks }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
+  {{- end }}
+spec:
+  replicas: {{ .replicaCount }}
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxSurge: 1
+  #     maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: "{{ .image.repository }}"
+          # resources:
+          #   requests:
+          #     cpu: "{{ .resources.requests.cpu }}"
+          #     memory: "{{ .resources.requests.memory }}"
+          #   limits:
+          #     cpu: "{{ .resources.limits.cpu }}"
+          #     memory: "{{ .resources.limits.memory }}"
+          envFrom:
+            - configMapRef:
+                name: common-config
+            - secretRef:
+                name: common-secrets
+          env:
+            {{- range $key, $value := .env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+          {{- if .volume }}
+          volumeMounts:
+            - name: {{ .name }}-volume
+              mountPath: {{ .volume.path }}
+              subPath: {{ .volume.subPath }}
+          {{- end }}
+      {{- if .initContainers }}
+      initContainers:
+        - name: {{ .initContainers.name}}
+          image: {{ .initContainers.repository }}
+          envFrom:
+            - configMapRef:
+                name: common-config
+            - secretRef:
+                name: common-secrets
+          env:
+            {{- range $key, $value := .env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+      {{- end }}
+      {{- if .volume }}
+      volumes:
+        - name: {{ .name }}-volume
+          persistentVolumeClaim:
+            claimName: {{ .volume.claimName }}
+      {{- end }}
+---
+{{- if .service }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-svc" .name }}
+spec:
+  selector:
+    app: {{ .name }}
+  ports:
+    - name: {{ .service.name | default .name }}
+      protocol: TCP
+      port: {{ .service.port }}
+      targetPort: {{ .service.port }}
+--- 
+{{- end }}
+{{- end }}

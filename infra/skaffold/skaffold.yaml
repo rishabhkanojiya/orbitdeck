@@ -1,0 +1,180 @@
+apiVersion: skaffold/v4beta8
+kind: Config
+
+.COMMON_ARTIFACTS:
+  ARTIFACTS_DEFINITION:
+    - &USER
+      image: rishabh75/templateapp-user
+      context: ../../server/node
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.main
+    - &VOTING
+      image: rishabh75/templateapp-python
+      context: ../../server/python
+      requires:
+        - image: rishabh75/templateapp-internal-migration
+          alias: MIGRATION
+      sync:
+        manual:
+          - src: ./**/*.py
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.python
+    - &EMAIL
+      image: rishabh75/templateapp-email
+      context: ../../server/node
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.email
+    - &CRON
+      image: rishabh75/templateapp-email-cron
+      context: ../../server/node
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.cron
+    - &CLIENT
+      image: rishabh75/templateapp-client
+      context: ../../client/
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.client
+    - &CLIENT-PROD
+      image: rishabh75/templateapp-client-prod
+      context: ../../client/
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.client-prod
+    - &MIGRATE
+      image: rishabh75/templateapp-internal-migration
+      context: ../../server/node
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.migrate
+  COMMON_ARTIFACTSETS:
+    DEFAULT_ARTIFACTS: &DEFAULT_ARTIFACTS
+      - *MIGRATE
+      - *USER
+      - *VOTING
+      - *EMAIL
+      - *CRON
+      - *CLIENT
+    DEV_ARTIFACTS: &DEV_ARTIFACTS
+      - *MIGRATE
+      - *USER
+      - *VOTING
+      - *EMAIL
+      - *CRON
+      - *CLIENT
+    PROD_ARTIFACTS: &PROD_ARTIFACTS
+      - *MIGRATE
+      - *USER
+      - *VOTING
+      - *EMAIL
+      - *CRON
+      - *CLIENT-PROD
+
+# build: &DEFAULT_BUILD
+#   local:
+#     push: false
+#   artifacts: *DEFAULT_ARTIFACTS
+# deploy:
+#   helm:
+#     releases:
+#       - name: templateapp-release
+#         chartPath: ../helm/
+#         createNamespace: true
+#         valuesFiles:
+#           - ../helm/values/dev.yaml
+
+profiles:
+  - name: dev
+    deploy:
+      helm:
+        releases:
+          # - name: templateapp-dev-release
+          #   chartPath: ../helm/
+          #   namespace: templateapp-dev
+          #   createNamespace: true
+          #   wait: true
+          #   valuesFiles:
+          #     - ../helm/values/migration.yaml
+          - name: templateapp-dev-release
+            chartPath: ../helm/
+            namespace: templateapp-dev
+            createNamespace: true
+            wait: true
+            valuesFiles:
+              - ../helm/values/dev.yaml
+    build:
+      local:
+        push: true
+      tagPolicy:
+        sha256: {}
+      artifacts: *DEV_ARTIFACTS
+
+  - name: prod
+    deploy:
+      helm:
+        releases:
+          # - name: templateapp-prod-release
+          #   chartPath: ../helm/
+          #   namespace: templateapp-prod
+          #   createNamespace: true
+          #   wait: true
+          #   valuesFiles:
+          #     - ../helm/values/migration.yaml
+          - name: templateapp-prod-release
+            chartPath: ../helm/
+            namespace: templateapp-prod
+            createNamespace: true
+            wait: true
+            valuesFiles:
+              - ../helm/values/prod.yaml
+    build:
+      local:
+        push: true
+      tagPolicy:
+        sha256: {}
+        # dateTime: {}
+      artifacts: *PROD_ARTIFACTS
+
+  - name: server
+    deploy:
+      helm:
+        releases:
+          # - name: templateapp-server-release
+          #   chartPath: ../helm/
+          #   namespace: templateapp-server
+          #   createNamespace: true
+          #   wait: true
+          #   valuesFiles:
+          #     - ../helm/values/migration.yaml
+          - name: templateapp-server-release
+            chartPath: ../helm/
+            namespace: templateapp-server
+            createNamespace: true
+            wait: true
+            valuesFiles:
+              - ../helm/values/server.yaml
+
+    # build:
+    #   local:
+    #     push: true
+    #   tagPolicy:
+    #     gitCommit: {}
+    #   artifacts: *PROD_ARTIFACTS
