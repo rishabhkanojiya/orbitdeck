@@ -1,0 +1,164 @@
+package api
+
+import (
+	"context"
+	"database/sql"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"your-app/internal/db"
+)
+
+type DeploymentService struct {
+	queries *db.Queries
+	pool    *pgxpool.Pool
+}
+
+func NewDeploymentService(pool *pgxpool.Pool) *DeploymentService {
+	return &DeploymentService{
+		queries: db.New(pool),
+		pool:    pool,
+	}
+}
+
+type CreateDeploymentRequest struct {
+	Name        string            `json:"name"`
+	Environment string            `json:"environment"`
+	Components  []CreateComponent `json:"components"`
+}
+
+type CreateComponent struct {
+	Name         string           `json:"name"`
+	Image        ImageRequest     `json:"image"`
+	ReplicaCount int32            `json:"replica_count"`
+	Resources    ResourcesRequest `json:"resources"`
+	ServicePort  int32            `json:"service_port"`
+	Env          []EnvVarRequest  `json:"env"`
+}
+
+type ImageRequest struct {
+	Repository string `json:"repository"`
+	Tag        string `json:"tag"`
+}
+
+type ResourcesRequest struct {
+	Requests struct {
+		CPU    string `json:"cpu"`
+		Memory string `json:"memory"`
+	} `json:"requests"`
+	Limits struct {
+		CPU    string `json:"cpu"`
+		Memory string `json:"memory"`
+	} `json:"limits"`
+}
+
+type EnvVarRequest struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func (s *DeploymentService) CreateDeployment(c *gin.Context) {
+	ctx := context.Background()
+	var req CreateDeploymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start transaction"})
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := s.queries.WithTx(tx)
+
+	// Create deployment
+	deployment, err := qtx.CreateDeployment(ctx, db.CreateDeploymentParams{
+		Name:        req.Name,
+		Environment: req.Environment,
+		HelmRelease: generateHelmReleaseName(req.Name, req.Environment),
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Create components
+	for _, comp := range req.Components {
+		// Validate image repository
+		if comp.Image.Repository == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "image repository is required"})
+			return
+		}
+
+		// Create component
+		component, err := qtx.CreateComponent(ctx, db.CreateComponentParams{
+			DeploymentID: deployment.ID,
+			Name:         comp.Name,
+			ReplicaCount: comp.ReplicaCount,
+			ServicePort:  comp.ServicePort,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Create image
+		_, err = qtx.CreateImage(ctx, db.CreateImageParams{
+			ComponentID: component.ID,
+			Repository:  comp.Image.Repository,
+			Tag:         comp.Image.Tag,
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Create resources
+		_, err = qtx.CreateResources(ctx, db.CreateResourcesParams{
+			ComponentID:    component.ID,
+			RequestsCpu:    sql.NullString{String: comp.Resources.Requests.CPU, Valid: comp.Resources.Requests.CPU != ""},
+			RequestsMemory: sql.NullString{String: comp.Resources.Requests.Memory, Valid: comp.Resources.Requests.Memory != ""},
+			LimitsCpu:      sql.NullString{String: comp.Resources.Limits.CPU, Valid: comp.Resources.Limits.CPU != ""},
+			LimitsMemory:   sql.NullString{String: comp.Resources.Limits.Memory, Valid: comp.Resources.Limits.Memory != ""},
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Create environment variables
+		for _, env := range comp.Env {
+			_, err = qtx.CreateEnvVar(ctx, db.CreateEnvVarParams{
+				ComponentID: component.ID,
+				Key:         env.Key,
+				Value:       env.Value,
+			})
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"id":           deployment.ID,
+		"helm_release": deployment.HelmRelease,
+	})
+}
+
+func generateHelmReleaseName(name, env string) string {
+	return "orbit-" + name + "-" + env
+}
+
+// Add similar handlers for GetDeployment, ListDeployments, etc.

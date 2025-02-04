@@ -5,13 +5,90 @@
 package db
 
 import (
+	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
-type Core struct {
-	ID        int64     `json:"id"`
-	Owner     string    `json:"owner"`
-	Balance   int64     `json:"balance"`
-	Currency  string    `json:"currency"`
-	CreatedAt time.Time `json:"created_at"`
+type Environment string
+
+const (
+	EnvironmentDev     Environment = "dev"
+	EnvironmentStaging Environment = "staging"
+	EnvironmentProd    Environment = "prod"
+)
+
+func (e *Environment) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Environment(s)
+	case string:
+		*e = Environment(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Environment: %T", src)
+	}
+	return nil
+}
+
+type NullEnvironment struct {
+	Environment Environment `json:"environment"`
+	Valid       bool        `json:"valid"` // Valid is true if Environment is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEnvironment) Scan(value interface{}) error {
+	if value == nil {
+		ns.Environment, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Environment.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEnvironment) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Environment), nil
+}
+
+type Component struct {
+	ID           int64         `json:"id"`
+	DeploymentID int64         `json:"deployment_id"`
+	Name         string        `json:"name"`
+	ReplicaCount int32         `json:"replica_count"`
+	ServicePort  sql.NullInt32 `json:"service_port"`
+}
+
+type Deployment struct {
+	ID          int64          `json:"id"`
+	Name        string         `json:"name"`
+	Environment Environment    `json:"environment"`
+	HelmRelease sql.NullString `json:"helm_release"`
+	CreatedAt   time.Time      `json:"created_at"`
+}
+
+type EnvVar struct {
+	ID          int64  `json:"id"`
+	ComponentID int64  `json:"component_id"`
+	Key         string `json:"key"`
+	Value       string `json:"value"`
+}
+
+type Image struct {
+	ID          int64  `json:"id"`
+	ComponentID int64  `json:"component_id"`
+	Repository  string `json:"repository"`
+	Tag         string `json:"tag"`
+}
+
+type Resource struct {
+	ID             int64          `json:"id"`
+	ComponentID    int64          `json:"component_id"`
+	RequestsCpu    sql.NullString `json:"requests_cpu"`
+	RequestsMemory sql.NullString `json:"requests_memory"`
+	LimitsCpu      sql.NullString `json:"limits_cpu"`
+	LimitsMemory   sql.NullString `json:"limits_memory"`
 }

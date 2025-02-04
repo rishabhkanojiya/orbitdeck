@@ -8,6 +8,7 @@ import (
 
 type Store interface {
 	Querier
+	CreateDeploymentTx(ctx context.Context, params CreateDeploymentTxParams) (Deployment, error)
 }
 
 // Store provides all functions to execute db queries and transaction

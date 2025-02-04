@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS deployments;
+DROP TABLE IF EXISTS components;
+DROP TABLE IF EXISTS images;
+DROP TABLE IF EXISTS resources;
+DROP TABLE IF EXISTS env_vars;

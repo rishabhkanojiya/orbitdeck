@@ -48,11 +48,8 @@ func NewServer(config config.Config, store db.Store, taskDistributor worker.Task
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	authRoutes := router.Group("/").Use(api.AuthMiddleware(server.tokenMaker))
-	// authRoutes := router.Group("/")
-	authRoutes.POST("/cores", server.createCore)
-	authRoutes.GET("/cores/:id", server.getCore)
-	authRoutes.GET("/cores", server.getCores)
+	deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
+	deploymentRoutes.POST("/add", server.CreateDeployment)
 
 	server.router = router
 }

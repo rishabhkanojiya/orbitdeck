@@ -9,13 +9,13 @@ import (
 )
 
 type Querier interface {
-	AddCoreBalance(ctx context.Context, arg AddCoreBalanceParams) (Core, error)
-	CreateCore(ctx context.Context, arg CreateCoreParams) (Core, error)
-	DeleteCore(ctx context.Context, id int64) error
-	GetCore(ctx context.Context, id int64) (Core, error)
-	GetCoreForUpdate(ctx context.Context, id int64) (Core, error)
-	ListCores(ctx context.Context, arg ListCoresParams) ([]Core, error)
-	UpdateCore(ctx context.Context, arg UpdateCoreParams) (Core, error)
+	CreateComponent(ctx context.Context, arg CreateComponentParams) (Component, error)
+	CreateDeployment(ctx context.Context, arg CreateDeploymentParams) (Deployment, error)
+	CreateEnvVar(ctx context.Context, arg CreateEnvVarParams) (EnvVar, error)
+	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
+	CreateResources(ctx context.Context, arg CreateResourcesParams) (Resource, error)
+	GetDeployment(ctx context.Context, id int64) (Deployment, error)
+	GetDeploymentComponents(ctx context.Context, deploymentID int64) ([]GetDeploymentComponentsRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -33,21 +33,53 @@ Content-Type: {{contentType}}
 @login_token = {{login.response.body.access_token}}
 
 
-###
-GET http://{{host}}/cores/1
-Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
+# ###
+# GET http://{{host}}/cores/1
+# Content-Type: {{contentType}}
+# Authorization: Bearer {{login_token}}
 
 ###
-POST http://{{host}}/cores
+POST http://{{host}}/deployment/add
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
 
 {
-    "currency": "CAD"
+  "name": "user-service",
+  "environment": "dev",
+  "components": [
+    {
+      "name": "user",
+      "image": {
+        "repository": "rishabh75/templateapp-user",
+        "tag": "latest"
+      },
+      "replica_count": 1,
+      "service_port": 9069,
+      "resources": {
+        "requests": {
+          "cpu": "1",
+          "memory": "500Mi"
+        },
+        "limits": {
+          "cpu": "1",
+          "memory": "500Mi"
+        }
+      },
+      "env": [
+        {
+          "key": "MODE",
+          "value": "server"
+        },
+        {
+          "key": "SERVER_TYPE",
+          "value": "USER"
+        }
+      ]
+    }
+  ]
 }
 
-###
-GET http://{{host}}/cores?page_id=1&page_size=5
-Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
+# ###
+# GET http://{{host}}/cores?page_id=1&page_size=5
+# Content-Type: {{contentType}}
+# Authorization: Bearer {{login_token}}
