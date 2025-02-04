@@ -14,6 +14,7 @@ type Querier interface {
 	CreateEnvVar(ctx context.Context, arg CreateEnvVarParams) (EnvVar, error)
 	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
 	CreateResources(ctx context.Context, arg CreateResourcesParams) (Resource, error)
+	GetComponentEnvVars(ctx context.Context, componentID int64) ([]GetComponentEnvVarsRow, error)
 	GetDeployment(ctx context.Context, id int64) (Deployment, error)
 	GetDeploymentComponents(ctx context.Context, deploymentID int64) ([]GetDeploymentComponentsRow, error)
 }

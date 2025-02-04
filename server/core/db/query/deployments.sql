@@ -28,14 +28,13 @@ SELECT * FROM deployments WHERE id = $1;
 
 -- name: GetDeploymentComponents :many
 SELECT 
-    c.*,
-    i.repository,
-    i.tag,
-    r.requests_cpu,
-    r.requests_memory,
-    r.limits_cpu,
-    r.limits_memory
+    c.id, c.name, c.replica_count, c.service_port,
+    i.repository, i.tag,
+    r.requests_cpu, r.requests_memory, r.limits_cpu, r.limits_memory
 FROM components c
 LEFT JOIN images i ON i.component_id = c.id
 LEFT JOIN resources r ON r.component_id = c.id
 WHERE c.deployment_id = $1;
+
+-- name: GetComponentEnvVars :many
+SELECT key, value FROM env_vars WHERE component_id = $1;

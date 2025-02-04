@@ -50,6 +50,7 @@ func (server *Server) setupRouter() {
 
 	deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
 	deploymentRoutes.POST("/add", server.CreateDeployment)
+	deploymentRoutes.GET("/:id", server.GetDeployment)
 
 	server.router = router
 }

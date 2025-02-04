@@ -148,6 +148,38 @@ func (q *Queries) CreateResources(ctx context.Context, arg CreateResourcesParams
 	return i, err
 }
 
+const getComponentEnvVars = `-- name: GetComponentEnvVars :many
+SELECT key, value FROM env_vars WHERE component_id = $1
+`
+
+type GetComponentEnvVarsRow struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func (q *Queries) GetComponentEnvVars(ctx context.Context, componentID int64) ([]GetComponentEnvVarsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getComponentEnvVars, componentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetComponentEnvVarsRow{}
+	for rows.Next() {
+		var i GetComponentEnvVarsRow
+		if err := rows.Scan(&i.Key, &i.Value); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDeployment = `-- name: GetDeployment :one
 SELECT id, name, environment, helm_release, created_at FROM deployments WHERE id = $1
 `
@@ -167,13 +199,9 @@ func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, erro
 
 const getDeploymentComponents = `-- name: GetDeploymentComponents :many
 SELECT 
-    c.id, c.deployment_id, c.name, c.replica_count, c.service_port,
-    i.repository,
-    i.tag,
-    r.requests_cpu,
-    r.requests_memory,
-    r.limits_cpu,
-    r.limits_memory
+    c.id, c.name, c.replica_count, c.service_port,
+    i.repository, i.tag,
+    r.requests_cpu, r.requests_memory, r.limits_cpu, r.limits_memory
 FROM components c
 LEFT JOIN images i ON i.component_id = c.id
 LEFT JOIN resources r ON r.component_id = c.id
@@ -182,7 +210,6 @@ WHERE c.deployment_id = $1
 
 type GetDeploymentComponentsRow struct {
 	ID             int64          `json:"id"`
-	DeploymentID   int64          `json:"deployment_id"`
 	Name           string         `json:"name"`
 	ReplicaCount   int32          `json:"replica_count"`
 	ServicePort    sql.NullInt32  `json:"service_port"`
@@ -205,7 +232,6 @@ func (q *Queries) GetDeploymentComponents(ctx context.Context, deploymentID int6
 		var i GetDeploymentComponentsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.DeploymentID,
 			&i.Name,
 			&i.ReplicaCount,
 			&i.ServicePort,
