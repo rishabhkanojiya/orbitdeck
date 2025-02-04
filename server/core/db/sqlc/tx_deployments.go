@@ -6,7 +6,6 @@ import (
 	"fmt"
 )
 
-// Common type for Deployment parameters
 type DeploymentParams struct {
 	ID          int64
 	Name        string
@@ -14,6 +13,7 @@ type DeploymentParams struct {
 	HelmRelease string
 	Components  []ComponentParams
 	CreatedAt   sql.NullTime
+	AfterCreate func(id int64) error
 }
 
 type ComponentParams struct {
@@ -47,7 +47,7 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 	var deployment Deployment
 
 	err := store.execTx(ctx, func(q *Queries) error {
-		// Create deployment
+
 		d, err := q.CreateDeployment(ctx, CreateDeploymentParams{
 			Name:        params.Name,
 			Environment: Environment(params.Environment),
@@ -69,7 +69,6 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 				return err
 			}
 
-			// Create image
 			_, err = q.CreateImage(ctx, CreateImageParams{
 				ComponentID: c.ID,
 				Repository:  comp.Image.Repository,
@@ -79,7 +78,6 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 				return err
 			}
 
-			// Create resources
 			_, err = q.CreateResources(ctx, CreateResourcesParams{
 				ComponentID:    c.ID,
 				RequestsCpu:    sql.NullString{String: comp.Resources.Requests.CPU, Valid: comp.Resources.Requests.CPU != ""},
@@ -91,7 +89,6 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 				return err
 			}
 
-			// Create environment variables
 			for _, env := range comp.Env {
 				_, err = q.CreateEnvVar(ctx, CreateEnvVarParams{
 					ComponentID: c.ID,
@@ -105,26 +102,26 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 		}
 
 		deployment = d
-		return nil
+
+		return params.AfterCreate(deployment.ID)
+
 	})
 
 	return deployment, err
 }
 
 func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (DeploymentParams, error) {
-	// Get the base deployment
+
 	deployment, err := store.Queries.GetDeployment(ctx, id)
 	if err != nil {
 		return DeploymentParams{}, fmt.Errorf("failed to get deployment: %w", err)
 	}
 
-	// Get components with their images and resources
 	components, err := store.Queries.GetDeploymentComponents(ctx, id)
 	if err != nil {
 		return DeploymentParams{}, fmt.Errorf("failed to get components: %w", err)
 	}
 
-	// Get environment variables for each component
 	var compParams []ComponentParams
 	for _, comp := range components {
 		envVars, err := store.Queries.GetComponentEnvVars(ctx, comp.ID)

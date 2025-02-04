@@ -9,85 +9,67 @@ import (
 	"time"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
-// HelmDeployer defines the interface for Helm deployment operations
 type HelmDeployer interface {
-	Deploy(deployment db.Deployment) error
+	Deploy(deployment db.DeploymentParams) error
 }
 
-// HelmService handles Helm chart operations
 type HelmService struct {
-	chartPath   string        // Path to Helm charts directory
-	kubeconfig  string        // Path to kubeconfig file
-	helmTimeout time.Duration // Timeout for Helm operations
-	logger      Logger        // Custom logger interface
+	chartPath   string
+	helmTimeout time.Duration
 }
 
-type Logger interface {
-	Info(msg string)
-	Error(msg string, err error)
-}
-
-// NewHelmService creates a new Helm service
-func NewHelmService(chartPath, kubeconfig string, logger Logger) *HelmService {
+func NewHelmService(chartPath string) *HelmService {
 	return &HelmService{
 		chartPath:   chartPath,
-		kubeconfig:  kubeconfig,
 		helmTimeout: 5 * time.Minute,
-		logger:      logger,
 	}
 }
 
-// Deploy handles the Helm deployment process
-func (s *HelmService) Deploy(deployment db.Deployment) error {
-	// Generate values.yaml content from deployment
+func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
+
 	values, err := s.generateValues(deployment)
 	if err != nil {
 		return fmt.Errorf("failed to generate Helm values: %w", err)
 	}
 
-	// Create temporary values file
 	valuesPath, err := s.createValuesFile(values)
 	if err != nil {
 		return fmt.Errorf("failed to create values file: %w", err)
 	}
 	defer os.Remove(valuesPath)
 
-	// Build Helm command arguments
 	args := []string{
 		"upgrade", "--install",
-		deployment.HelmRelease.String,
+		deployment.HelmRelease,
 		filepath.Join(s.chartPath, "orbit-base"),
 		"-f", valuesPath,
 		"-n", "orbit",
 		"--create-namespace",
-		"--kubeconfig", s.kubeconfig,
 		"--wait",
 		"--timeout", s.helmTimeout.String(),
 	}
 
-	// Execute Helm command
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "helm", args...)
 
-	// Capture output for logging
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		s.logger.Error("Helm command failed", fmt.Errorf("%s: %s", err, string(output)))
-		return fmt.Errorf("helm deployment failed: %w\n%s", err, string(output))
+		log.Error().Err(err).Int64("id", deployment.ID).Msg("Helm command failed")
+		return err
 	}
 
-	s.logger.Info(fmt.Sprintf("Helm deployment successful for %s\n%s",
-		deployment.HelmRelease, string(output)))
+	log.Info().Str("Release", deployment.HelmRelease).
+		Str("output", string(output)).Msg("Helm deployment successful")
 	return nil
 }
 
-// generateValues creates the Helm values structure from the deployment
-func (s *HelmService) generateValues(deployment db.Deployment) (map[string]interface{}, error) {
+func (s *HelmService) generateValues(deployment db.DeploymentParams) (map[string]interface{}, error) {
 	components := make([]map[string]interface{}, 0, len(deployment.Components))
 
 	for _, comp := range deployment.Components {
@@ -123,7 +105,6 @@ func (s *HelmService) generateValues(deployment db.Deployment) (map[string]inter
 	}, nil
 }
 
-// createValuesFile creates a temporary values.yaml file
 func (s *HelmService) createValuesFile(values map[string]interface{}) (string, error) {
 	data, err := yaml.Marshal(values)
 	if err != nil {
@@ -143,13 +124,15 @@ func (s *HelmService) createValuesFile(values map[string]interface{}) (string, e
 	return tmpFile.Name(), nil
 }
 
-// VerifyHelmInstallation checks if Helm is installed and working
 func (s *HelmService) VerifyHelmInstallation() error {
 	cmd := exec.Command("helm", "version")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("helm not installed or not working properly: %w\n%s", err, string(output))
 	}
-	s.logger.Info("Helm version:\n" + string(output))
+
+	log.Info().
+		Str("Helm version: ", string(output)).Msg("Helm Verified successful")
+
 	return nil
 }

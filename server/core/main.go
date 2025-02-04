@@ -7,7 +7,7 @@ import (
 	"github.com/rishabhkanojiya/orbitdeck/server/core/api"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
-	"github.com/rishabhkanojiya/orbitdeck/server/core/mail"
+	service "github.com/rishabhkanojiya/orbitdeck/server/core/service"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 
 	"github.com/hibiken/asynq"
@@ -58,8 +58,9 @@ func runDBMigration(migrationURL string, dbSource string) {
 }
 
 func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
-	mailer := mail.NewGmailSender(config.EMAIL_SENDER_NAME, config.EMAIL_SENDER_ADDRESS, config.EMAIL_SENDER_PASSWORD)
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
+	// mailer := mail.NewGmailSender(config.EMAIL_SENDER_NAME, config.EMAIL_SENDER_ADDRESS, config.EMAIL_SENDER_PASSWORD)
+	helmSvc := service.NewHelmService("..\\..\\infra\\helm")
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, helmSvc)
 	log.Info().Msg("start task processor")
 	err := taskProcessor.Start()
 	if err != nil {

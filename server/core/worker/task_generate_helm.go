@@ -9,15 +9,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const TaskSendVerifyEmail = "task:send_verify_email"
+const TaskGenerateHelm = "task:generate_helm"
 
-type PayloadSendVerifyEmail struct {
-	Username string `json:"username"`
+type PayloadGenerateHelm struct {
+	Id int64 `json:"id"`
 }
 
-func (distributor *RedisTaskDistributor) DistributeTaskSendVerifyEmail(
+func (distributor *RedisTaskDistributor) DistributeTaskGenerateHelm(
 	ctx context.Context,
-	payload *PayloadSendVerifyEmail,
+	payload *PayloadGenerateHelm,
 	opts ...asynq.Option,
 ) error {
 	jsonPayload, err := json.Marshal(payload)
@@ -25,7 +25,7 @@ func (distributor *RedisTaskDistributor) DistributeTaskSendVerifyEmail(
 		return fmt.Errorf("failed to marshal task payload: %w", err)
 	}
 
-	task := asynq.NewTask(TaskSendVerifyEmail, jsonPayload, opts...)
+	task := asynq.NewTask(TaskGenerateHelm, jsonPayload, opts...)
 	info, err := distributor.client.EnqueueContext(ctx, task)
 	if err != nil {
 		return fmt.Errorf("failed to enqueue task: %w", err)
@@ -36,26 +36,24 @@ func (distributor *RedisTaskDistributor) DistributeTaskSendVerifyEmail(
 	return nil
 }
 
-func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error {
-	var payload PayloadSendVerifyEmail
+func (processor *RedisTaskProcessor) ProcessTaskGenerateHelm(ctx context.Context, task *asynq.Task) error {
+	var payload PayloadGenerateHelm
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
+	deployment, err := processor.store.GetDeploymentObject(ctx, payload.Id)
 
-	subject := "Welcome to Simple Bank"
-	content := fmt.Sprintf(`Hello %s,<br/>
-	Thank you for registering with us!<br/>
-	Please  to verify your email address.<br/>
-	`, payload.Username)
-
-	to := []string{"testemail@gmail.com"}
-
-	err := processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
 	if err != nil {
-		return fmt.Errorf("failed to send verify email: %w", err)
+		return err
+	}
+
+	err = processor.helmSvc.Deploy(deployment)
+
+	if err != nil {
+		return fmt.Errorf("failed to Deploy: %w", err)
 	}
 
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).
-		Str("email", to[0]).Msg("processed task")
+		Str("name", deployment.Name).Msg("processed task")
 	return nil
 }

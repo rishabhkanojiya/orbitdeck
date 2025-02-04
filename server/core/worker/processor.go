@@ -4,7 +4,7 @@ import (
 	"context"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
-	"github.com/rishabhkanojiya/orbitdeck/server/core/mail"
+	service "github.com/rishabhkanojiya/orbitdeck/server/core/service"
 
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
@@ -17,16 +17,16 @@ const (
 
 type TaskProcessor interface {
 	Start() error
-	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
+	ProcessTaskGenerateHelm(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {
-	server *asynq.Server
-	store  db.Store
-	mailer mail.EmailSender
+	server  *asynq.Server
+	store   db.Store
+	helmSvc *service.HelmService
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, mailer mail.EmailSender) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSvc *service.HelmService) TaskProcessor {
 	server := asynq.NewServer(
 		redisOpt,
 		asynq.Config{
@@ -43,16 +43,16 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, mailer
 	)
 
 	return &RedisTaskProcessor{
-		server: server,
-		store:  store,
-		mailer: mailer,
+		server:  server,
+		store:   store,
+		helmSvc: helmSvc,
 	}
 }
 
 func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux()
 
-	mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	mux.HandleFunc(TaskGenerateHelm, processor.ProcessTaskGenerateHelm)
 
 	return processor.server.Start(mux)
 }

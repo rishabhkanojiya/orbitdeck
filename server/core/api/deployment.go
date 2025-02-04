@@ -5,9 +5,12 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 )
 
 type CreateDeploymentRequest struct {
@@ -64,6 +67,17 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		Name:        req.Name,
 		Environment: req.Environment,
 		Components:  make([]db.ComponentParams, len(req.Components)),
+		AfterCreate: func(id int64) error {
+			taskPayload := &worker.PayloadGenerateHelm{
+				Id: id,
+			}
+			opts := []asynq.Option{
+				asynq.MaxRetry(1),
+				asynq.ProcessIn(1 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+			return server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
+		},
 	}
 
 	for i, comp := range req.Components {
