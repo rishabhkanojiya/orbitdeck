@@ -1,0 +1,51 @@
+package main
+
+import (
+	"context"
+	"os/exec"
+	"path/filepath"
+	"time"
+
+	"github.com/rs/zerolog/log"
+)
+
+type DeploymentTemp struct {
+	Id          int64
+	HelmRelease string
+	helmTimeout time.Duration
+}
+
+func main() {
+
+	deployment := DeploymentTemp{
+		Id:          1,
+		HelmRelease: "release-1",
+		helmTimeout: 5 * time.Minute,
+	}
+
+	valuesPath := filepath.Join("..", "..", "infra", "helm", "values", "dev.yaml")
+	chartPath := filepath.Join("..", "..", "infra", "helm")
+
+	args := []string{
+		"upgrade", "--install",
+		deployment.HelmRelease,
+		chartPath,
+		"-f", valuesPath,
+		"-n", "orbit",
+		"--create-namespace",
+		"--dry-run",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), deployment.helmTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "helm", args...)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Error().Err(err).Int64("id", deployment.Id).Msg("Helm command failed")
+	}
+
+	log.Info().Str("Release", deployment.HelmRelease).
+		Str("output", string(output)).Msg("Helm deployment successful")
+}

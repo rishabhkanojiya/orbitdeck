@@ -67,17 +67,18 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		Name:        req.Name,
 		Environment: req.Environment,
 		Components:  make([]db.ComponentParams, len(req.Components)),
-		AfterCreate: func(id int64) error {
-			taskPayload := &worker.PayloadGenerateHelm{
-				Id: id,
-			}
-			opts := []asynq.Option{
-				asynq.MaxRetry(1),
-				asynq.ProcessIn(1 * time.Second),
-				asynq.Queue(worker.QueueCritical),
-			}
-			return server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
-		},
+	}
+
+	AfterCreate := func(id int64) error {
+		taskPayload := &worker.PayloadGenerateHelm{
+			Id: id,
+		}
+		opts := []asynq.Option{
+			asynq.MaxRetry(0),
+			asynq.ProcessIn(1 * time.Second),
+			asynq.Queue(worker.QueueCore),
+		}
+		return server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
 	}
 
 	for i, comp := range req.Components {
@@ -116,17 +117,11 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		}
 	}
 
-	deployment, err := server.store.CreateDeploymentTx(ctx, params)
+	deployment, err := server.store.CreateDeploymentTx(ctx, params, AfterCreate)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	// // Deploy to Helm
-	// if err := server.helmSvc.Deploy(deployment); err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Helm deployment failed: " + err.Error()})
-	// 	return
-	// }
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"id":           deployment.ID,

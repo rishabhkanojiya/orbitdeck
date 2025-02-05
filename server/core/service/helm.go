@@ -1,11 +1,10 @@
-package services
+package service
 
 import (
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
@@ -41,16 +40,17 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		return fmt.Errorf("failed to create values file: %w", err)
 	}
 	defer os.Remove(valuesPath)
-
+	// fmt.Print(valuesPath)
 	args := []string{
 		"upgrade", "--install",
 		deployment.HelmRelease,
-		filepath.Join(s.chartPath, "orbit-base"),
+		s.chartPath,
 		"-f", valuesPath,
 		"-n", "orbit",
 		"--create-namespace",
-		"--wait",
-		"--timeout", s.helmTimeout.String(),
+		// "--wait",
+		// "--timeout", s.helmTimeout.String(),
+		"--dry-run",
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
@@ -60,7 +60,7 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Error().Err(err).Int64("id", deployment.ID).Msg("Helm command failed")
+		log.Error().Err(err).Int64("id", deployment.ID).Interface("Data", values).Msg("Helm command failed")
 		return err
 	}
 

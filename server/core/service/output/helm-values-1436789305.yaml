@@ -1,0 +1,63 @@
+components:
+    - env:
+        - key: POSTGRES_USER
+          value: root
+        - key: POSTGRES_PASSWORD
+          value: root
+        - key: POSTGRES_DB
+          value: be-templateapp
+      image:
+        repository: postgres:14.10-alpine3.19
+        tag: latest
+      name: internal-postgres
+      replicaCount: 1
+      resources:
+        limits:
+            cpu: "1"
+            memory: 500Mi
+        requests:
+            cpu: "1"
+            memory: 500Mi
+      service:
+        port: 5432
+    - env:
+        - key: MODE
+          value: server
+        - key: SERVER_TYPE
+          value: USER
+      image:
+        repository: rishabh75/templateapp-user
+        tag: latest
+      name: user
+      replicaCount: 1
+      resources:
+        limits:
+            cpu: "1"
+            memory: 500Mi
+        requests:
+            cpu: "1"
+            memory: 500Mi
+      service:
+        port: 9069
+    - env:
+        - key: API_URL
+          value: https://templateapp.app/api/user
+        - key: ENV
+          value: development
+        - key: PORT
+          value: "3000"
+      image:
+        repository: rishabh75/templateapp-client
+        tag: latest
+      name: client
+      replicaCount: 1
+      resources:
+        limits:
+            cpu: "1"
+            memory: 1000Mi
+        requests:
+            cpu: "1"
+            memory: 1000Mi
+      service:
+        port: 3000
+environment: dev

@@ -34,7 +34,7 @@ Content-Type: {{contentType}}
 
 
 ###
-GET http://{{host}}/deployment/1
+GET http://{{host}}/deployment/83
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
 
@@ -73,6 +73,114 @@ Authorization: Bearer {{login_token}}
         {
           "key": "SERVER_TYPE",
           "value": "USER"
+        }
+      ]
+    }
+  ]
+}
+
+
+###
+POST http://{{host}}/deployment/add
+Content-Type: {{contentType}}
+Authorization: Bearer {{login_token}}
+
+{
+  "name": "main",
+  "environment": "dev",
+  "components": [
+     {
+      "name": "internal-postgres",
+      "image": {
+        "repository": "postgres:14.10-alpine3.19",
+        "tag": "latest"
+      },
+      "replica_count": 1,
+      "service_port": 5432,
+      "resources": {
+        "requests": {
+          "cpu": "1",
+          "memory": "500Mi"
+        },
+        "limits": {
+          "cpu": "1",
+          "memory": "500Mi"
+        }
+      },
+      "env": [
+        {
+          "key": "POSTGRES_USER",
+          "value": "root"
+        },
+        {
+          "key": "POSTGRES_PASSWORD",
+          "value": "root"
+        },
+        {
+          "key": "POSTGRES_DB",
+          "value": "be-templateapp"
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "image": {
+        "repository": "rishabh75/templateapp-user",
+        "tag": "latest"
+      },
+      "replica_count": 1,
+      "service_port": 9069,
+      "resources": {
+        "requests": {
+          "cpu": "1",
+          "memory": "500Mi"
+        },
+        "limits": {
+          "cpu": "1",
+          "memory": "500Mi"
+        }
+      },
+      "env": [
+        {
+          "key": "MODE",
+          "value": "server"
+        },
+        {
+          "key": "SERVER_TYPE",
+          "value": "USER"
+        }
+      ]
+    },
+    {
+      "name": "client",
+      "image": {
+        "repository": "rishabh75/templateapp-client",
+        "tag": "latest"
+      },
+      "replica_count": 1,
+      "service_port": 3000,
+      "resources": {
+        "requests": {
+          "cpu": "1",
+          "memory": "1000Mi"
+        },
+        "limits": {
+          "cpu": "1",
+          "memory": "1000Mi"
+        }
+      },
+      "env": [
+        {
+          "key": "API_URL",
+          "value": "https://templateapp.app/api/user"
+        },
+        {
+          "key": "ENV",
+          "value": "development"
+        },
+        {
+          "key": "PORT",
+          "value": "3000"
         }
       ]
     }

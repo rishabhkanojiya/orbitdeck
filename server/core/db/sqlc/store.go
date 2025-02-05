@@ -8,7 +8,7 @@ import (
 
 type Store interface {
 	Querier
-	CreateDeploymentTx(ctx context.Context, params DeploymentParams) (Deployment, error)
+	CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) error) (Deployment, error)
 	GetDeploymentObject(ctx context.Context, id int64) (DeploymentParams, error)
 }
 

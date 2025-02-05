@@ -13,7 +13,6 @@ type DeploymentParams struct {
 	HelmRelease string
 	Components  []ComponentParams
 	CreatedAt   sql.NullTime
-	AfterCreate func(id int64) error
 }
 
 type ComponentParams struct {
@@ -43,7 +42,7 @@ type ResourcesParams struct {
 	}
 }
 
-func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params DeploymentParams) (Deployment, error) {
+func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) error) (Deployment, error) {
 	var deployment Deployment
 
 	err := store.execTx(ctx, func(q *Queries) error {
@@ -103,7 +102,7 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 
 		deployment = d
 
-		return params.AfterCreate(deployment.ID)
+		return AfterCreate(deployment.ID)
 
 	})
 

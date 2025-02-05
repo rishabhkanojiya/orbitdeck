@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	QueueAuth     = "auth"
 	QueueCritical = "critical"
 	QueueDefault  = "default"
 )
@@ -31,6 +32,7 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, mailer
 		redisOpt,
 		asynq.Config{
 			Queues: map[string]int{
+				QueueAuth:     10,
 				QueueCritical: 10,
 				QueueDefault:  5,
 			},
