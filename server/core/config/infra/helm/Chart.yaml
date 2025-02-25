@@ -1,0 +1,6 @@
+# Chart.yaml
+apiVersion: v2
+name: templateapp-helm-chart
+description: Helm chart for the entire TemplateApp
+type: application
+version: 0.1.0

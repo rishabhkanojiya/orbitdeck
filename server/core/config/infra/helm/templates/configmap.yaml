@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: common-config
+data:
+  SSL: "false"
+  NODE_ENV: "development"
+  CORS: "true"
+  ENABLE_CORS: "true"
+  NODE_TLS_REJECT_UNAUTHORIZED: "0"
+  DEBUG_DEVELOPER: "true"
+  REDIS_PORT: "6379"
+  EMAIL_ID: "broderick.johnston@ethereal.email"
+  EMAIL_TOKEN: "xrBfqbB2h8UuTttc6T"
+  EMAIL_TYPE: "test"
+  PORT: "9069"

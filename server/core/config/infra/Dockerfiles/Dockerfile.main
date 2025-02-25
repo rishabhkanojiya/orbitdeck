@@ -1,0 +1,13 @@
+FROM node:14-alpine
+
+RUN mkdir /srv/be-templateapp
+WORKDIR /srv/be-templateapp
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+COPY . .
+
+CMD ["sh", "-c", "node index.js"]
+# CMD ["sh", "-c", "npm run migrate && node index.js"]

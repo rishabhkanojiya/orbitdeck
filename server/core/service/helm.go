@@ -40,7 +40,7 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		return fmt.Errorf("failed to create values file: %w", err)
 	}
 	defer os.Remove(valuesPath)
-	// fmt.Print(valuesPath)
+
 	args := []string{
 		"upgrade", "--install",
 		deployment.HelmRelease,
@@ -48,10 +48,15 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		"-f", valuesPath,
 		"-n", "orbit",
 		"--create-namespace",
-		// "--wait",
-		// "--timeout", s.helmTimeout.String(),
-		"--dry-run",
+		"--wait",
+		"--timeout", s.helmTimeout.String(),
+		// "--dry-run",
 	}
+	// args := []string{
+	// 	"uninstall",
+	// 	deployment.HelmRelease,
+	// 	"--dry-run",
+	// }
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
 	defer cancel()
@@ -60,7 +65,7 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Error().Err(err).Int64("id", deployment.ID).Interface("Data", values).Msg("Helm command failed")
+		log.Error().Err(err).Int64("id", deployment.ID).Msg("Helm command failed")
 		return err
 	}
 
@@ -100,8 +105,8 @@ func (s *HelmService) generateValues(deployment db.DeploymentParams) (map[string
 	}
 
 	return map[string]interface{}{
-		"components":  components,
-		"environment": deployment.Environment,
+		"components": components,
+		// "environment": deployment.Environment,
 	}, nil
 }
 

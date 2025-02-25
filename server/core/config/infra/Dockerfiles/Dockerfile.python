@@ -1,0 +1,15 @@
+FROM python:3.9.17
+
+RUN mkdir /srv/be-service-voting
+WORKDIR /srv/be-service-voting
+
+COPY ./requirements.txt .
+RUN pip install -r ./requirements.txt
+
+RUN pip install uwsgi
+
+COPY . .
+
+EXPOSE 9069
+
+CMD ["uwsgi", "--ini", "uwsgi.ini"]

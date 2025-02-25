@@ -1,0 +1,63 @@
+
+# ingress-template
+{{- if .Values.ingress }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-svc
+  {{- if .Values.ingress.annotations }}
+  annotations:  
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+        {{- range .Values.ingress.tls.hosts }}
+        - {{ . }}
+        {{- end }}
+      secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
+  {{- if .Values.ingress.backend }}
+  defaultBackend:
+    service:
+      name: {{ .Values.ingress.backend.service }}
+      port: 
+        number: {{ .Values.ingress.backend.port }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.rules }}
+    {{- if .host }}
+    - host: {{ .host }}
+      http:
+    {{ else }}
+    - http:
+    {{- end }}
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ .backend.serviceName }}
+                port:
+                  number: {{ .backend.servicePort }}
+          {{- end }}
+    {{- end }}
+{{- end }}
+
+# ---
+# ingressController:
+#   replicaCount: 2
+#   service:
+#     loadBalancerIP: ""
+#     nodeSelector:
+#       "kubernetes.io/os": "linux"
+#     externalTrafficPolicy: Local
+
+# defaultBackend:
+#   nodeSelector:
+#     "kubernetes.io/os": "linux"

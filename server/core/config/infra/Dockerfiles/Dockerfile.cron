@@ -1,0 +1,12 @@
+FROM node:14-alpine
+
+RUN mkdir /srv/be-cron
+WORKDIR /srv/be-cron
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+COPY . .
+
+CMD ["sh", "-c", "node index.js"]

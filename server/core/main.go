@@ -61,7 +61,7 @@ func runDBMigration(migrationURL string, dbSource string) {
 func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
 	// mailer := mail.NewGmailSender(config.EMAIL_SENDER_NAME, config.EMAIL_SENDER_ADDRESS, config.EMAIL_SENDER_PASSWORD)
 
-	helmSvc := service.NewHelmService(filepath.Join("..", "..", "infra", "helm"))
+	helmSvc := service.NewHelmService(filepath.Join("config", "infra", "helm"))
 
 	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, helmSvc)
 	log.Info().Msg("start task processor")

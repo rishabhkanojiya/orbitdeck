@@ -1,0 +1,45 @@
+# job-template
+{{- range .Values.jobs }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-job" .name }}
+  {{- if .hooks }}
+  annotations:
+    {{- range $key, $value := .hooks }}
+    {{ $key }}: "{{ $value }}"
+    {{- end }}
+  {{- end }}
+spec:
+  completions: {{ .completions }}
+  backoffLimit: {{ .backoffLimit }}
+  selector: {} # Ensure that the selector is auto-generated
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ .name }}
+          image: "{{ .image.repository }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          resources:
+            requests:
+              cpu: "{{ .resources.requests.cpu }}"
+              memory: "{{ .resources.requests.memory }}"
+            limits:
+              cpu: "{{ .resources.limits.cpu }}"
+              memory: "{{ .resources.limits.memory }}"
+          envFrom:
+            - configMapRef:
+                name: common-config
+            - secretRef:
+                name: common-secrets
+          env:
+            {{- range $key, $value := .env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+            {{- end }}
+--- 
+{{- end }}

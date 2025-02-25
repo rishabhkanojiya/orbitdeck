@@ -1,0 +1,18 @@
+
+{{- if .Values.ingress }}
+  {{- if .Values.ingress.backend }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-loadbalancer
+spec:
+  type: LoadBalancer
+  # CHANGE HERE
+  loadBalancerIP: 13.92.101.193
+  selector:
+    app: nginx-ingress
+  ports:
+    - port: 80
+      targetPort: 80
+  {{- end }}
+{{- end }}

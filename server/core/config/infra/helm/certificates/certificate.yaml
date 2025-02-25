@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+
+kind: Certificate
+metadata:
+  name: k8-relise-live-tls
+spec:
+  secretName: k8-relise-live-tls
+  issuerRef:
+    name: issuer-config
+    kind: ClusterIssuer
+  commonName: k8.relise.live
+  dnsNames:
+    - k8.relise.live
+    - www.k8.relise.live
