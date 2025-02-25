@@ -1,0 +1,20 @@
+components:
+  - env:
+      - key: MODE
+        value: server
+      - key: SERVER_TYPE
+        value: USER
+    image:
+      repository: rishabh75/templateapp-user
+      tag: latest
+    name: user
+    replicaCount: "1"
+    resources:
+      limits:
+        cpu: "1"
+        memory: 500Mi
+      requests:
+        cpu: "1"
+        memory: 500Mi
+    service:
+      port: "9069"

@@ -33,6 +33,9 @@ sqlc:
 server:
 	go run main.go
 
+run:
+	nodemon --exec go run main.go --signal SIGTERM
+
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
 

@@ -42,9 +42,9 @@ spec:
             - secretRef:
                 name: common-secrets
           env:
-            {{- range $key, $value := .env }}
-            - name: {{ $key }}
-              value: "{{ $value }}"
+            {{- range .env }}
+            - name: {{ .key }}
+              value: {{ .value | quote }}
             {{- end }}
           {{- if .volume }}
           volumeMounts:
@@ -63,8 +63,8 @@ spec:
                 name: common-secrets
           env:
             {{- range .env }}
-            - name: {{ .name }}
-              value: {{ .value }}
+            - name: {{ .key }}
+              value: {{ .value | quote }}
             {{- end }}
       {{- end }}
       {{- if .volume }}

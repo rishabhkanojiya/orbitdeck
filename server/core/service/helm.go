@@ -29,7 +29,6 @@ func NewHelmService(chartPath string) *HelmService {
 }
 
 func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
-
 	values, err := s.generateValues(deployment)
 	if err != nil {
 		return fmt.Errorf("failed to generate Helm values: %w", err)
@@ -46,17 +45,12 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		deployment.HelmRelease,
 		s.chartPath,
 		"-f", valuesPath,
-		"-n", "orbit",
+		"-n", "orbit-" + deployment.Environment,
 		"--create-namespace",
 		"--wait",
 		"--timeout", s.helmTimeout.String(),
 		// "--dry-run",
 	}
-	// args := []string{
-	// 	"uninstall",
-	// 	deployment.HelmRelease,
-	// 	"--dry-run",
-	// }
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
 	defer cancel()
@@ -65,8 +59,9 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Error().Err(err).Int64("id", deployment.ID).Msg("Helm command failed")
-		return err
+		log.Debug().Str("args", fmt.Sprintf("%v", args)).Msg("Helm command arguments")
+		log.Error().Err(err).Int64("id", deployment.ID).Str("output", string(output)).Msg("Helm command failed")
+		return fmt.Errorf("helm command failed: %s", output)
 	}
 
 	log.Info().Str("Release", deployment.HelmRelease).
