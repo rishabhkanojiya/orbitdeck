@@ -19,6 +19,7 @@ const (
 type TaskProcessor interface {
 	Start() error
 	ProcessTaskGenerateHelm(ctx context.Context, task *asynq.Task) error
+	ProcessTaskUninstallHelm(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {
@@ -55,6 +56,7 @@ func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux()
 
 	mux.HandleFunc(TaskGenerateHelm, processor.ProcessTaskGenerateHelm)
+	mux.HandleFunc(TaskUninstallHelm, processor.ProcessTaskUninstallHelm)
 
 	return processor.server.Start(mux)
 }

@@ -37,6 +37,10 @@ Content-Type: {{contentType}}
 GET http://{{host}}/deployment/83
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
+###
+POST http://{{host}}/deployment/83
+Content-Type: {{contentType}}
+Authorization: Bearer {{login_token}}
 
 ###
 POST http://{{host}}/deployment/add

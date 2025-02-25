@@ -12,6 +12,11 @@ type TaskDistributor interface {
 		payload *PayloadGenerateHelm,
 		opts ...asynq.Option,
 	) error
+	DistributeTaskUninstallHelm(
+		ctx context.Context,
+		payload *PayloadUninstallHelm,
+		opts ...asynq.Option,
+	) error
 }
 
 type RedisTaskDistributor struct {

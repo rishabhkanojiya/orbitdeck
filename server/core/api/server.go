@@ -51,6 +51,7 @@ func (server *Server) setupRouter() {
 	deploymentRoutes := router.Group("/deployment")
 	deploymentRoutes.POST("/add", server.CreateDeployment)
 	deploymentRoutes.GET("/:id", server.GetDeployment)
+	deploymentRoutes.POST("/:id", server.UninstallDeployment)
 
 	server.router = router
 }

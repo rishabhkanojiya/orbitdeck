@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -147,4 +148,37 @@ func (server *Server) GetDeployment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, deployment)
+}
+
+func (server *Server) UninstallDeployment(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	deployment, err := server.store.GetDeployment(c.Request.Context(), int64(id))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "deployment not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	taskPayload := &worker.PayloadUninstallHelm{
+		Id: id,
+	}
+	opts := []asynq.Option{
+		asynq.MaxRetry(0),
+		asynq.ProcessIn(1 * time.Second),
+		asynq.Queue(worker.QueueCore),
+	}
+	server.taskDistributor.DistributeTaskUninstallHelm(c, taskPayload, opts...)
+
+	c.JSON(http.StatusOK, gin.H{
+		"deployment": deployment,
+		"Message":    fmt.Sprintf("Helm Release %s will be removed soon", deployment.HelmRelease.String),
+	})
 }

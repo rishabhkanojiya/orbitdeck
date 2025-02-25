@@ -14,6 +14,7 @@ import (
 
 type HelmDeployer interface {
 	Deploy(deployment db.DeploymentParams) error
+	Uninstall(deployment db.Deployment) error
 }
 
 type HelmService struct {
@@ -66,6 +67,31 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 
 	log.Info().Str("Release", deployment.HelmRelease).
 		Str("output", string(output)).Msg("Helm deployment successful")
+	return nil
+}
+
+func (s *HelmService) Uninstall(deployment db.Deployment) error {
+
+	args := []string{
+		"uninstall",
+		deployment.HelmRelease.String,
+		"-n", "orbit-" + string(deployment.Environment),
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "helm", args...)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Debug().Str("args", fmt.Sprintf("%v", args)).Msg("Helm command arguments")
+		log.Error().Err(err).Int64("id", deployment.ID).Str("output", string(output)).Msg("Helm command failed")
+		return fmt.Errorf("helm command failed: %s", output)
+	}
+
+	log.Info().Str("Release", deployment.HelmRelease.String).
+		Str("output", string(output)).Msg("Helm Uninstall successful")
 	return nil
 }
 
