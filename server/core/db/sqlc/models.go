@@ -84,6 +84,15 @@ type Image struct {
 	Tag         string `json:"tag"`
 }
 
+type Ingress struct {
+	ID           int64     `json:"id"`
+	DeploymentID int64     `json:"deployment_id"`
+	Host         string    `json:"host"`
+	Path         string    `json:"path"`
+	ServicePort  int32     `json:"service_port"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
 type Resource struct {
 	ID             int64          `json:"id"`
 	ComponentID    int64          `json:"component_id"`

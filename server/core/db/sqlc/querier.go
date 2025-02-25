@@ -13,10 +13,14 @@ type Querier interface {
 	CreateDeployment(ctx context.Context, arg CreateDeploymentParams) (Deployment, error)
 	CreateEnvVar(ctx context.Context, arg CreateEnvVarParams) (EnvVar, error)
 	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
+	CreateIngress(ctx context.Context, arg CreateIngressParams) (Ingress, error)
 	CreateResources(ctx context.Context, arg CreateResourcesParams) (Resource, error)
+	DeleteIngress(ctx context.Context, id int64) error
 	GetComponentEnvVars(ctx context.Context, componentID int64) ([]GetComponentEnvVarsRow, error)
 	GetDeployment(ctx context.Context, id int64) (Deployment, error)
 	GetDeploymentComponents(ctx context.Context, deploymentID int64) ([]GetDeploymentComponentsRow, error)
+	GetIngressByDeployment(ctx context.Context, deploymentID int64) ([]Ingress, error)
+	GetIngressByHost(ctx context.Context, host string) (Ingress, error)
 }
 
 var _ Querier = (*Queries)(nil)
