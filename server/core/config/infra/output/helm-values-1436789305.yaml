@@ -17,4 +17,4 @@ components:
         cpu: "1"
         memory: 500Mi
     service:
-      port: "9069"
+      port: 9069

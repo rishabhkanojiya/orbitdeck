@@ -1,6 +1,6 @@
 -- name: CreateIngress :one
-INSERT INTO ingresses (deployment_id, host, path, service_port)
-VALUES ($1, $2, $3, $4)
+INSERT INTO ingresses (deployment_id, host, path, service_name, service_port)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: GetIngressByDeployment :many

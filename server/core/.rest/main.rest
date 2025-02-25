@@ -80,7 +80,10 @@ Authorization: Bearer {{login_token}}
         }
       ]
     }
-  ]
+  ],
+  "ingress": {
+        "host": "templateapp.app"
+  }
 }
 
 

@@ -18,6 +18,15 @@ type CreateDeploymentRequest struct {
 	Name        string             `json:"name"`
 	Environment string             `json:"environment"`
 	Components  []ComponentRequest `json:"components"`
+	Ingress     *IngressRequest    `json:"ingress"` // Make ingress optional
+
+}
+
+type IngressRequest struct {
+	Host        string `json:"host"`
+	Path        string `json:"path,omitempty"`
+	ServiceName string `json:"serviceName,omitempty"`
+	ServicePort int32  `json:"servicePort,omitempty"`
 }
 
 type ComponentRequest struct {
@@ -68,6 +77,15 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		Name:        req.Name,
 		Environment: req.Environment,
 		Components:  make([]db.ComponentParams, len(req.Components)),
+	}
+
+	if req.Ingress == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ingress value is required"})
+		return
+	}
+
+	if req.Ingress != nil && req.Ingress.Host != "" {
+		params.Ingress = generateIngressFromComponents(req.Ingress.Host, req.Components, req.Ingress)
 	}
 
 	AfterCreate := func(id int64) error {
@@ -128,6 +146,39 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		"id":           deployment.ID,
 		"helm_release": deployment.HelmRelease,
 	})
+}
+
+func generateIngressFromComponents(host string, components []ComponentRequest, ingressReq *IngressRequest) []db.IngressParams {
+	var ingressRules []db.IngressParams
+
+	for _, comp := range components {
+		rule := db.IngressParams{
+			Host:        host,
+			Path:        fmt.Sprintf("/api/%s", comp.Name),
+			ServiceName: comp.Name,
+			ServicePort: comp.ServicePort,
+		}
+
+		if ingressReq != nil {
+			if ingressReq.Path != "" {
+				rule.Path = ingressReq.Path
+			}
+			if ingressReq.ServiceName != "" {
+				rule.ServiceName = ingressReq.ServiceName
+			}
+			if ingressReq.ServicePort != 0 {
+				rule.ServicePort = ingressReq.ServicePort
+			}
+		}
+
+		if comp.Name == "client" {
+			rule.Path = "/?(.*)"
+		}
+
+		ingressRules = append(ingressRules, rule)
+	}
+
+	return ingressRules
 }
 
 func (server *Server) GetDeployment(c *gin.Context) {

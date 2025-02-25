@@ -1,0 +1,31 @@
+components:
+  - env:
+      MODE: server
+      SERVER_TYPE: USER
+    image:
+      repository: rishabh75/templateapp-user
+      tag: latest
+    name: user
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: "1"
+        memory: 500Mi
+      requests:
+        cpu: "1"
+        memory: 500Mi
+    service:
+      port: 9069
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  ingressClassName: nginx
+  rules:
+    - host: templateapp.app
+      paths:
+        - backend:
+            serviceName: -svc
+            servicePort: 9069
+          path: /api/user
+          pathType: ImplementationSpecific

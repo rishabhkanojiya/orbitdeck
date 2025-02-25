@@ -119,16 +119,70 @@ func (s *HelmService) generateValues(deployment db.DeploymentParams) (map[string
 			"service": map[string]interface{}{
 				"port": comp.ServicePort,
 			},
-			"env": comp.Env,
+			"env": convertEnvVars(comp.Env),
 		}
 
 		components = append(components, componentValues)
 	}
 
-	return map[string]interface{}{
+	var ingressValues map[string]interface{}
+	if len(deployment.Ingress) > 0 {
+		ingressValues = s.generateIngressValues(deployment.Ingress)
+	}
+
+	values := map[string]interface{}{
 		"components": components,
-		// "environment": deployment.Environment,
-	}, nil
+	}
+
+	if ingressValues != nil {
+		values["ingress"] = ingressValues
+	}
+
+	return values, nil
+}
+
+func (s *HelmService) generateIngressValues(ingress []db.IngressParams) map[string]interface{} {
+	rules := make([]map[string]interface{}, len(ingress))
+
+	for i, ing := range ingress {
+		rule := map[string]interface{}{
+			// "host": ing.Host,
+			"paths": []map[string]interface{}{
+				{
+					"path":     fmt.Sprintf("%s/?(.*)", ing.Path),
+					"pathType": "ImplementationSpecific",
+					"backend": map[string]interface{}{
+						"serviceName": fmt.Sprintf("%s-svc", ing.ServiceName),
+						"servicePort": ing.ServicePort,
+					},
+				},
+			},
+		}
+
+		// Special handling for client path
+		if ing.ServiceName == "client" {
+			rule["paths"].([]map[string]interface{})[0]["path"] = "/?(.*)"
+		}
+
+		rules[i] = rule
+	}
+
+	return map[string]interface{}{
+		"ingressClassName": "nginx",
+		"annotations": map[string]string{
+			"nginx.ingress.kubernetes.io/use-regex":      "true",
+			"nginx.ingress.kubernetes.io/rewrite-target": "/$1",
+		},
+		"rules": rules,
+	}
+}
+
+func convertEnvVars(envVars []db.GetComponentEnvVarsRow) map[string]string {
+	result := make(map[string]string)
+	for _, env := range envVars {
+		result[env.Key] = env.Value
+	}
+	return result
 }
 
 func (s *HelmService) createValuesFile(values map[string]interface{}) (string, error) {

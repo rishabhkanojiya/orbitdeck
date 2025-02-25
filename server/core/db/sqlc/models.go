@@ -89,6 +89,7 @@ type Ingress struct {
 	DeploymentID int64     `json:"deployment_id"`
 	Host         string    `json:"host"`
 	Path         string    `json:"path"`
+	ServiceName  string    `json:"service_name"`
 	ServicePort  int32     `json:"service_port"`
 	CreatedAt    time.Time `json:"created_at"`
 }

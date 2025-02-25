@@ -12,7 +12,15 @@ type DeploymentParams struct {
 	Environment string
 	HelmRelease string
 	Components  []ComponentParams
+	Ingress     []IngressParams // Add ingress support
 	CreatedAt   sql.NullTime
+}
+
+type IngressParams struct {
+	Host        string
+	Path        string
+	ServiceName string
+	ServicePort int32
 }
 
 type ComponentParams struct {
@@ -100,6 +108,20 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 			}
 		}
 
+		// Create ingress rules
+		for _, ingress := range params.Ingress {
+			_, err := q.CreateIngress(ctx, CreateIngressParams{
+				DeploymentID: d.ID,
+				Host:         ingress.Host,
+				Path:         ingress.Path,
+				ServicePort:  ingress.ServicePort,
+				ServiceName:  ingress.ServiceName,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
 		deployment = d
 
 		return AfterCreate(deployment.ID)
@@ -119,6 +141,11 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 	components, err := store.Queries.GetDeploymentComponents(ctx, id)
 	if err != nil {
 		return DeploymentParams{}, fmt.Errorf("failed to get components: %w", err)
+	}
+
+	ingressRules, err := store.Queries.GetIngressByDeployment(ctx, id)
+	if err != nil {
+		return DeploymentParams{}, fmt.Errorf("failed to get ingress rules: %w", err)
 	}
 
 	var compParams []ComponentParams
@@ -157,6 +184,16 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 		})
 	}
 
+	var ingressParams []IngressParams
+	for _, ingress := range ingressRules {
+		ingressParams = append(ingressParams, IngressParams{
+			Host:        ingress.Host,
+			Path:        ingress.Path,
+			ServicePort: ingress.ServicePort,
+			ServiceName: ingress.ServiceName,
+		})
+	}
+
 	return DeploymentParams{
 		ID:          deployment.ID,
 		Name:        deployment.Name,
@@ -164,6 +201,7 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 		HelmRelease: deployment.HelmRelease.String,
 		CreatedAt:   sql.NullTime{Time: deployment.CreatedAt, Valid: true},
 		Components:  compParams,
+		Ingress:     ingressParams,
 	}, nil
 }
 

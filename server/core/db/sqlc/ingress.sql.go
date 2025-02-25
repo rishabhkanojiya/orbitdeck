@@ -10,15 +10,16 @@ import (
 )
 
 const createIngress = `-- name: CreateIngress :one
-INSERT INTO ingresses (deployment_id, host, path, service_port)
-VALUES ($1, $2, $3, $4)
-RETURNING id, deployment_id, host, path, service_port, created_at
+INSERT INTO ingresses (deployment_id, host, path, service_name, service_port)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, deployment_id, host, path, service_name, service_port, created_at
 `
 
 type CreateIngressParams struct {
 	DeploymentID int64  `json:"deployment_id"`
 	Host         string `json:"host"`
 	Path         string `json:"path"`
+	ServiceName  string `json:"service_name"`
 	ServicePort  int32  `json:"service_port"`
 }
 
@@ -27,6 +28,7 @@ func (q *Queries) CreateIngress(ctx context.Context, arg CreateIngressParams) (I
 		arg.DeploymentID,
 		arg.Host,
 		arg.Path,
+		arg.ServiceName,
 		arg.ServicePort,
 	)
 	var i Ingress
@@ -35,6 +37,7 @@ func (q *Queries) CreateIngress(ctx context.Context, arg CreateIngressParams) (I
 		&i.DeploymentID,
 		&i.Host,
 		&i.Path,
+		&i.ServiceName,
 		&i.ServicePort,
 		&i.CreatedAt,
 	)
@@ -51,7 +54,7 @@ func (q *Queries) DeleteIngress(ctx context.Context, id int64) error {
 }
 
 const getIngressByDeployment = `-- name: GetIngressByDeployment :many
-SELECT id, deployment_id, host, path, service_port, created_at FROM ingresses WHERE deployment_id = $1
+SELECT id, deployment_id, host, path, service_name, service_port, created_at FROM ingresses WHERE deployment_id = $1
 `
 
 func (q *Queries) GetIngressByDeployment(ctx context.Context, deploymentID int64) ([]Ingress, error) {
@@ -68,6 +71,7 @@ func (q *Queries) GetIngressByDeployment(ctx context.Context, deploymentID int64
 			&i.DeploymentID,
 			&i.Host,
 			&i.Path,
+			&i.ServiceName,
 			&i.ServicePort,
 			&i.CreatedAt,
 		); err != nil {
@@ -85,7 +89,7 @@ func (q *Queries) GetIngressByDeployment(ctx context.Context, deploymentID int64
 }
 
 const getIngressByHost = `-- name: GetIngressByHost :one
-SELECT id, deployment_id, host, path, service_port, created_at FROM ingresses WHERE host = $1 LIMIT 1
+SELECT id, deployment_id, host, path, service_name, service_port, created_at FROM ingresses WHERE host = $1 LIMIT 1
 `
 
 func (q *Queries) GetIngressByHost(ctx context.Context, host string) (Ingress, error) {
@@ -96,6 +100,7 @@ func (q *Queries) GetIngressByHost(ctx context.Context, host string) (Ingress, e
 		&i.DeploymentID,
 		&i.Host,
 		&i.Path,
+		&i.ServiceName,
 		&i.ServicePort,
 		&i.CreatedAt,
 	)
