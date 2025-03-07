@@ -30,7 +30,7 @@ sqlc:
 	sqlc generate
 
 server:
-	./run.sh server
+	./run.sh $(name)
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine

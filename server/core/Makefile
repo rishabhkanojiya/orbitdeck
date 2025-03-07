@@ -31,7 +31,7 @@ sqlc:
 	sqlc generate
 
 server:
-	./run.sh
+	./run.sh $(name)
 
 run:
 	nodemon --exec go run main.go --signal SIGTERM

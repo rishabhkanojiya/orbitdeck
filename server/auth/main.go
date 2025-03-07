@@ -21,13 +21,11 @@ import (
 
 func main() {
 	configs, err := config.LoadConfig(".", ".env")
-	log.Printf("Loaded configuration: %+v", configs)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
 
-	// log.Fatal().Str("DB_DRIVER", configs.DB_DRIVER).Msg("cannot load config")
 	conn, err := sql.Open(configs.DB_DRIVER, configs.DB_CONN)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db")
