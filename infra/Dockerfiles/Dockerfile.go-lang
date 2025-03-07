@@ -1,7 +1,7 @@
 # Build stage
 FROM golang:1.23.3-alpine3.19 AS builder
 RUN apk add --no-cache git
-RUN git config --global url."https://<TOKEN>@github.com/rishabhkanojiya/orbitdeck".insteadOf "https://github.com/rishabhkanojiya/orbitdeck"
+RUN git config --global url."https://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@github.com/rishabhkanojiya/orbitdeck".insteadOf "https://github.com/rishabhkanojiya/orbitdeck"
 WORKDIR /app
 COPY . .
 RUN go env -w GOPRIVATE=github.com/rishabhkanojiya/orbitdec
@@ -13,8 +13,10 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY .env .
 COPY start.sh .
+RUN chmod +x /app/start.sh
 COPY db/migration ./db/migration
 
-EXPOSE 8081
+RUN ls -l /app
+
 CMD [ "/app/main" ]
 ENTRYPOINT [ "/app/start.sh" ]

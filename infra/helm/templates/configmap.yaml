@@ -3,14 +3,11 @@ kind: ConfigMap
 metadata:
   name: common-config
 data:
-  SSL: "false"
-  NODE_ENV: "development"
-  CORS: "true"
-  ENABLE_CORS: "true"
-  NODE_TLS_REJECT_UNAUTHORIZED: "0"
-  DEBUG_DEVELOPER: "true"
-  REDIS_PORT: "6379"
-  EMAIL_ID: "broderick.johnston@ethereal.email"
-  EMAIL_TOKEN: "xrBfqbB2h8UuTttc6T"
-  EMAIL_TYPE: "test"
-  PORT: "9069"
+  DB_DRIVER: postgres
+  # DB_CONN: postgresql://root:root@localhost:5432/auth?sslmode=disable
+  SERVER_ADDRESS: localhost
+  TOKEN_SYMMETRIC_KEY: "6d2e4c40-c5f6-4b95-84d6-6f5a4554"
+  ACCESS_TOKEN_DURATION: 15m
+  REFRESH_TOKEN_DURATION: 24h
+  REDIS_ADDRESS: 0.0.0.0:6379
+  MIGRATION_URL: file://db/migration

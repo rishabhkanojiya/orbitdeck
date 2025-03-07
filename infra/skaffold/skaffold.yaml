@@ -8,28 +8,28 @@ kind: Config
       context: ../../server/auth
       sync:
         manual:
-          - src: src/**/*.go
+          - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.main
+        dockerfile: ../Dockerfiles/Dockerfile.go-lang
     - &CORE
       image: rishabh75/orbitdeck-core
       context: ../../server/core
       sync:
         manual:
-          - src: src/**/*.go
+          - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.main
+        dockerfile: ../Dockerfiles/Dockerfile.go-lang
     - &EMAIL
       image: rishabh75/orbitdeck-email
       context: ../../server/auth
       sync:
         manual:
-          - src: src/**/*.go
+          - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.email
+        dockerfile: ../Dockerfiles/Dockerfile.go-lang
     # - &CLIENT
     #   image: rishabh75/orbitdeck-client
     #   context: ../../client/
@@ -94,12 +94,12 @@ profiles:
             chartPath: ../helm/
             namespace: orbitdeck-dev
             createNamespace: true
-            wait: true
+            # wait: true
             valuesFiles:
               - ../helm/values/dev.yaml
     build:
       local:
-        push: true
+        push: false
       tagPolicy:
         sha256: {}
       artifacts: *DEV_ARTIFACTS

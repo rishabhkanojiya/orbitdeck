@@ -57,21 +57,23 @@ COMPONENT_DEFINITION:
         memory: "500Mi"
     service:
       port: 9069
-  - &CORE
-    name: core
-    replicaCount: 1
-    image:
-      repository: rishabh75/orbitdeck-core
-      tag: latest
-    resources:
-      requests:
-        cpu: "1"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "500Mi"
-    service:
-      port: 9069
+    env:
+      SERVER_PORT: 9069
+  # - &CORE
+  #   name: core
+  #   replicaCount: 1
+  #   image:
+  #     repository: rishabh75/orbitdeck-core
+  #     tag: latest
+  #   resources:
+  #     requests:
+  #       cpu: "1"
+  #       memory: "500Mi"
+  #     limits:
+  #       cpu: "1"
+  #       memory: "500Mi"
+  #   service:
+  #     port: 9069
   - &EMAIL
     name: email
     replicaCount: 1
@@ -87,10 +89,10 @@ COMPONENT_DEFINITION:
         memory: "500Mi"
     env:
       MODE: "worker"
-      SERVER_TYPE: "email"
-      WORKER_TYPE: "email"
-      QUEUE_NAME: "EMAIL_WORKER_QUEUE_1"
-      WORKER_CONCURRENCY: "5"
+      SERVER_TYPE: "email-worker"
+      EMAIL_SENDER_NAME: Nikki Parker
+      EMAIL_SENDER_ADDRESS: nikki96@ethereal.email
+      EMAIL_SENDER_PASSWORD: vyPM1PtxuRee7MGZZe
 
 INGRESS_DEFINITION: &INGRESS_DEFINITION
   - &DEV_INGRESS
@@ -160,7 +162,7 @@ DEV_COMPONENTS: &DEV_COMPONENTS
   - *INTERNAL-POSTGRES
   - *EMAIL-REDIS
   - *AUTH
-  - *CORE
+  # - *CORE
   - *EMAIL
   # - *CLIENT
 
