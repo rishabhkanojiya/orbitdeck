@@ -11,6 +11,8 @@ type Config struct {
 	DB_CONN                string        `mapstructure:"DB_CONN"`
 	SERVER_ADDRESS         string        `mapstructure:"SERVER_ADDRESS"`
 	SERVER_PORT            int           `mapstructure:"SERVER_PORT"`
+	MODE                   string        `mapstructure:"MODE"`
+	WORKER_TYPE            string        `mapstructure:"WORKER_TYPE"`
 	TOKEN_SYMMETRIC_KEY    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	ACCESS_TOKEN_DURATION  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	REFRESH_TOKEN_DURATION time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`

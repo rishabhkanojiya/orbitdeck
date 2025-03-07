@@ -42,11 +42,11 @@ COMPONENT_DEFINITION:
     service:
       name: "caching"
       port: 6379
-  - &USER
-    name: user
+  - &AUTH
+    name: auth
     replicaCount: 1
     image:
-      repository: rishabh75/orbitdeck-user
+      repository: rishabh75/orbitdeck-auth
       tag: latest
     resources:
       requests:
@@ -57,9 +57,21 @@ COMPONENT_DEFINITION:
         memory: "500Mi"
     service:
       port: 9069
-    env:
-      MODE: "server"
-      SERVER_TYPE: "USER"
+  - &CORE
+    name: core
+    replicaCount: 1
+    image:
+      repository: rishabh75/orbitdeck-core
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
   - &EMAIL
     name: email
     replicaCount: 1
@@ -79,43 +91,6 @@ COMPONENT_DEFINITION:
       WORKER_TYPE: "email"
       QUEUE_NAME: "EMAIL_WORKER_QUEUE_1"
       WORKER_CONCURRENCY: "5"
-  - &PYTHON
-    name: python
-    replicaCount: 1
-    image:
-      repository: rishabh75/orbitdeck-python
-      tag: latest
-    initContainers:
-      name: migrate
-      repository: rishabh75/orbitdeck-internal-migration
-    resources:
-      requests:
-        cpu: "1"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "500Mi"
-    service:
-      port: 9069
-  - &CLIENT
-    name: client
-    replicaCount: 1
-    image:
-      repository: rishabh75/orbitdeck-client
-      tag: latest
-    resources:
-      requests:
-        cpu: "1"
-        memory: "1000Mi"
-      limits:
-        cpu: "1"
-        memory: "1000Mi"
-    service:
-      port: 3000
-    env:
-      API_URL: "https://orbitdeck.app/api/user"
-      ENV: "development"
-      PORT: 3000
 
 INGRESS_DEFINITION: &INGRESS_DEFINITION
   - &DEV_INGRESS
@@ -126,20 +101,15 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
     rules:
       - host: orbitdeck.app
         paths:
-          - path: /api/user/?(.*)
+          - path: /api/auth/?(.*)
             pathType: ImplementationSpecific
             backend:
-              serviceName: user-svc
+              serviceName: auth-svc
               servicePort: 9069
-          - path: /api/test/?(.*)
+          - path: /api/core/?(.*)
             pathType: ImplementationSpecific
             backend:
-              serviceName: test-svc
-              servicePort: 9069
-          - path: /api/python/?(.*)
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: python-svc
+              serviceName: core-svc
               servicePort: 9069
           - path: /?(.*)
             pathType: ImplementationSpecific
@@ -171,28 +141,28 @@ volumes:
   - name: postgres
     storage: 1Gi
 
-cronJobs:
-  - name: email-cron-job
-    schedule: "*/30 * * * *"
-    successfulJobsHistoryLimit: 3
-    failedJobsHistoryLimit: 1
-    concurrencyPolicy: "Forbid"
-    image: rishabh75/orbitdeck-email-cron
-    resources:
-      requests:
-        cpu: "1"
-        memory: "500Mi"
-      limits:
-        cpu: "1"
-        memory: "500Mi"
+# cronJobs:
+#   - name: email-cron-job
+#     schedule: "*/30 * * * *"
+#     successfulJobsHistoryLimit: 3
+#     failedJobsHistoryLimit: 1
+#     concurrencyPolicy: "Forbid"
+#     image: rishabh75/orbitdeck-email-cron
+#     resources:
+#       requests:
+#         cpu: "1"
+#         memory: "500Mi"
+#       limits:
+#         cpu: "1"
+#         memory: "500Mi"
 
 DEV_COMPONENTS: &DEV_COMPONENTS
   - *INTERNAL-POSTGRES
   - *EMAIL-REDIS
-  - *USER
+  - *AUTH
+  - *CORE
   - *EMAIL
-  - *PYTHON
-  - *CLIENT
+  # - *CLIENT
 
 components: *DEV_COMPONENTS
 

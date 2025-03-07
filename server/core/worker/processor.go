@@ -18,6 +18,7 @@ const (
 
 type TaskProcessor interface {
 	Start() error
+	StartSpecific(workerType string) error
 	ProcessTaskGenerateHelm(ctx context.Context, task *asynq.Task) error
 	ProcessTaskUninstallHelm(ctx context.Context, task *asynq.Task) error
 }
@@ -57,6 +58,21 @@ func (processor *RedisTaskProcessor) Start() error {
 
 	mux.HandleFunc(TaskGenerateHelm, processor.ProcessTaskGenerateHelm)
 	mux.HandleFunc(TaskUninstallHelm, processor.ProcessTaskUninstallHelm)
+
+	return processor.server.Start(mux)
+}
+
+func (processor *RedisTaskProcessor) StartSpecific(workerType string) error {
+	mux := asynq.NewServeMux()
+
+	switch workerType {
+	case "generate-helm":
+		mux.HandleFunc(TaskGenerateHelm, processor.ProcessTaskGenerateHelm)
+	case "uninstall-helm":
+		mux.HandleFunc(TaskUninstallHelm, processor.ProcessTaskUninstallHelm)
+	default:
+		log.Fatal().Msg("Invalid task type for processor")
+	}
 
 	return processor.server.Start(mux)
 }

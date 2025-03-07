@@ -21,9 +21,13 @@ import (
 
 func main() {
 	configs, err := config.LoadConfig(".", ".env")
+	log.Printf("Loaded configuration: %+v", configs)
+
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
+
+	// log.Fatal().Str("DB_DRIVER", configs.DB_DRIVER).Msg("cannot load config")
 	conn, err := sql.Open(configs.DB_DRIVER, configs.DB_CONN)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db")
@@ -37,11 +41,19 @@ func main() {
 		Addr: configs.REDIS_ADDRESS,
 	}
 
-	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+	runMode := configs.MODE
 
-	go runTaskProcessor(configs, redisOpt, store)
+	switch runMode {
+	case "server":
+		taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+		runGinServer(configs, store, taskDistributor)
 
-	runGinServer(configs, store, taskDistributor)
+	case "worker":
+		runTaskProcessor(configs, redisOpt, store)
+
+	default:
+		log.Fatal().Str("Mode", runMode).Msg("Invalid MODE. Set to 'server' or 'worker'")
+	}
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
@@ -58,10 +70,15 @@ func runDBMigration(migrationURL string, dbSource string) {
 }
 
 func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	workerType := config.WORKER_TYPE
+
 	mailer := mail.NewGmailSender(config.EMAIL_SENDER_NAME, config.EMAIL_SENDER_ADDRESS, config.EMAIL_SENDER_PASSWORD)
+
 	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
-	log.Info().Msg("start task processor")
-	err := taskProcessor.Start()
+
+	log.Info().Msgf("Starting task processor for: %s", workerType)
+
+	err := taskProcessor.StartSpecific(workerType)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start task processor")
 	}

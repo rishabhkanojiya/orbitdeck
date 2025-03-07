@@ -3,90 +3,74 @@ kind: Config
 
 .COMMON_ARTIFACTS:
   ARTIFACTS_DEFINITION:
-    - &USER
-      image: rishabh75/orbitdeck-user
-      context: ../../server/node
+    - &AUTH
+      image: rishabh75/orbitdeck-auth
+      context: ../../server/auth
       sync:
         manual:
-          - src: src/**/*.js
+          - src: src/**/*.go
             dest: .
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.main
-    - &VOTING
-      image: rishabh75/orbitdeck-python
-      context: ../../server/python
-      requires:
-        - image: rishabh75/orbitdeck-internal-migration
-          alias: MIGRATION
+    - &CORE
+      image: rishabh75/orbitdeck-core
+      context: ../../server/core
       sync:
         manual:
-          - src: ./**/*.py
+          - src: src/**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.python
+        dockerfile: ../Dockerfiles/Dockerfile.main
     - &EMAIL
       image: rishabh75/orbitdeck-email
-      context: ../../server/node
+      context: ../../server/auth
       sync:
         manual:
-          - src: src/**/*.js
+          - src: src/**/*.go
             dest: .
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.email
-    - &CRON
-      image: rishabh75/orbitdeck-email-cron
-      context: ../../server/node
-      sync:
-        manual:
-          - src: src/**/*.js
-            dest: .
-      docker:
-        dockerfile: ../Dockerfiles/Dockerfile.cron
-    - &CLIENT
-      image: rishabh75/orbitdeck-client
-      context: ../../client/
-      sync:
-        manual:
-          - src: src/**/*.js
-            dest: .
-      docker:
-        dockerfile: ../Dockerfiles/Dockerfile.client
-    - &CLIENT-PROD
-      image: rishabh75/orbitdeck-client-prod
-      context: ../../client/
-      sync:
-        manual:
-          - src: src/**/*.js
-            dest: .
-      docker:
-        dockerfile: ../Dockerfiles/Dockerfile.client-prod
-    - &MIGRATE
-      image: rishabh75/orbitdeck-internal-migration
-      context: ../../server/node
-      docker:
-        dockerfile: ../Dockerfiles/Dockerfile.migrate
+    # - &CLIENT
+    #   image: rishabh75/orbitdeck-client
+    #   context: ../../client/
+    #   sync:
+    #     manual:
+    #       - src: src/**/*.js
+    #         dest: .
+    #   docker:
+    #     dockerfile: ../Dockerfiles/Dockerfile.client
+    # - &CLIENT-PROD
+    #   image: rishabh75/orbitdeck-client-prod
+    #   context: ../../client/
+    #   sync:
+    #     manual:
+    #       - src: src/**/*.js
+    #         dest: .
+    #   docker:
+    #     dockerfile: ../Dockerfiles/Dockerfile.client-prod
+    # - &MIGRATE
+    #   image: rishabh75/orbitdeck-internal-migration
+    #   context: ../../server/auth
+    #   docker:
+    #     dockerfile: ../Dockerfiles/Dockerfile.migrate
   COMMON_ARTIFACTSETS:
-    DEFAULT_ARTIFACTS: &DEFAULT_ARTIFACTS
-      - *MIGRATE
-      - *USER
-      - *VOTING
+    DEFAULT_ARTIFACTS: &DEFAULT_ARTIFACTS # - *MIGRATE
+      - *AUTH
+      - *CORE
       - *EMAIL
-      - *CRON
-      - *CLIENT
-    DEV_ARTIFACTS: &DEV_ARTIFACTS
-      - *MIGRATE
-      - *USER
-      - *VOTING
+      # - *CLIENT
+    DEV_ARTIFACTS: &DEV_ARTIFACTS # - *MIGRATE
+      - *AUTH
+      - *CORE
       - *EMAIL
-      - *CRON
-      - *CLIENT
-    PROD_ARTIFACTS: &PROD_ARTIFACTS
-      - *MIGRATE
-      - *USER
-      - *VOTING
+      # - *CLIENT
+    PROD_ARTIFACTS: &PROD_ARTIFACTS # - *MIGRATE
+      - *AUTH
+      - *CORE
       - *EMAIL
-      - *CRON
-      - *CLIENT-PROD
+      # - *EMAIL
+      # - *CRON
+      # - *CLIENT-PROD
 
 # build: &DEFAULT_BUILD
 #   local:
@@ -106,13 +90,6 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: orbitdeck-dev-release
-          #   chartPath: ../helm/
-          #   namespace: orbitdeck-dev
-          #   createNamespace: true
-          #   wait: true
-          #   valuesFiles:
-          #     - ../helm/values/migration.yaml
           - name: orbitdeck-dev-release
             chartPath: ../helm/
             namespace: orbitdeck-dev
@@ -131,13 +108,6 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: orbitdeck-prod-release
-          #   chartPath: ../helm/
-          #   namespace: orbitdeck-prod
-          #   createNamespace: true
-          #   wait: true
-          #   valuesFiles:
-          #     - ../helm/values/migration.yaml
           - name: orbitdeck-prod-release
             chartPath: ../helm/
             namespace: orbitdeck-prod
@@ -157,13 +127,6 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: orbitdeck-server-release
-          #   chartPath: ../helm/
-          #   namespace: orbitdeck-server
-          #   createNamespace: true
-          #   wait: true
-          #   valuesFiles:
-          #     - ../helm/values/migration.yaml
           - name: orbitdeck-server-release
             chartPath: ../helm/
             namespace: orbitdeck-server

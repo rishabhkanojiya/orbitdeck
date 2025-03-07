@@ -18,6 +18,7 @@ const (
 
 type TaskProcessor interface {
 	Start() error
+	StartSpecific(workerType string) error
 	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
 }
 
@@ -55,6 +56,19 @@ func (processor *RedisTaskProcessor) Start() error {
 	mux := asynq.NewServeMux()
 
 	mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+
+	return processor.server.Start(mux)
+}
+
+func (processor *RedisTaskProcessor) StartSpecific(workerType string) error {
+	mux := asynq.NewServeMux()
+
+	switch workerType {
+	case "verify-email":
+		mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
+	default:
+		log.Fatal().Msg("Invalid task type for processor")
+	}
 
 	return processor.server.Start(mux)
 }
