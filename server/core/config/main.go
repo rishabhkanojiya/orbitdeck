@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/spf13/viper"
@@ -24,17 +25,19 @@ type Config struct {
 }
 
 func LoadConfig(path string, name string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName(name)
-	viper.SetConfigType("env")
+	v := viper.New()
 
-	viper.AutomaticEnv()
+	v.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-
-	if err != nil {
-		return
+	fmt.Println("Viper settings:")
+	for _, key := range v.AllKeys() {
+		fmt.Printf("%s: %s\n", key, v.Get(key))
 	}
-	err = viper.Unmarshal(&config)
-	return
+
+	err = v.Unmarshal(&config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
 }

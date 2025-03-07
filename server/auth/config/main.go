@@ -25,10 +25,8 @@ type Config struct {
 }
 
 func LoadConfig(path string, name string) (config Config, err error) {
-	// Initialize Viper
 	v := viper.New()
 
-	// Configure Viper to read environment variables
 	v.AutomaticEnv()
 
 	fmt.Println("Viper settings:")
@@ -36,7 +34,6 @@ func LoadConfig(path string, name string) (config Config, err error) {
 		fmt.Printf("%s: %s\n", key, v.Get(key))
 	}
 
-	// Unmarshal configuration into struct
 	err = v.Unmarshal(&config)
 	if err != nil {
 		return config, err
