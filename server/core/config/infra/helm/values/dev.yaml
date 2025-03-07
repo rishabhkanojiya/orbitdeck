@@ -18,7 +18,7 @@ COMPONENT_DEFINITION:
     env:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
-      POSTGRES_DB: "be-templateapp"
+      POSTGRES_DB: "be-orbitdeck"
     volume:
       path: /var/lib/postgresql/data
       subPath: postgres
@@ -43,7 +43,7 @@ COMPONENT_DEFINITION:
     name: user
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-user
+      repository: rishabh75/orbitdeck-user
       tag: latest
     resources:
       requests:
@@ -61,7 +61,7 @@ COMPONENT_DEFINITION:
     name: email
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-email
+      repository: rishabh75/orbitdeck-email
       tag: latest
     resources:
       requests:
@@ -80,11 +80,11 @@ COMPONENT_DEFINITION:
     name: python
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-python
+      repository: rishabh75/orbitdeck-python
       tag: latest
     initContainers:
       name: migrate
-      repository: rishabh75/templateapp-internal-migration
+      repository: rishabh75/orbitdeck-internal-migration
     resources:
       requests:
         cpu: "1"
@@ -98,7 +98,7 @@ COMPONENT_DEFINITION:
     name: client
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-client
+      repository: rishabh75/orbitdeck-client
       tag: latest
     resources:
       requests:
@@ -110,7 +110,7 @@ COMPONENT_DEFINITION:
     service:
       port: 3000
     env:
-      API_URL: "https://templateapp.app/api/user"
+      API_URL: "https://orbitdeck.app/api/user"
       ENV: "development"
       PORT: 3000
 
@@ -121,7 +121,7 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
       nginx.ingress.kubernetes.io/use-regex: "true"
       nginx.ingress.kubernetes.io/rewrite-target: /$1
     rules:
-      - host: templateapp.app
+      - host: orbitdeck.app
         paths:
           - path: /api/user/?(.*)
             pathType: ImplementationSpecific
@@ -150,7 +150,7 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
 #     backoffLimit: 1
 #     enabled: true
 #     image:
-#       repository: rishabh75/templateapp-internal-migration
+#       repository: rishabh75/orbitdeck-internal-migration
 #       tag: latest
 #       pullPolicy: IfNotPresent
 #     resources:
@@ -174,7 +174,7 @@ cronJobs:
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 1
     concurrencyPolicy: "Forbid"
-    image: rishabh75/templateapp-email-cron
+    image: rishabh75/orbitdeck-email-cron
     resources:
       requests:
         cpu: "1"

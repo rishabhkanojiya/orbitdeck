@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_DB: be-templateapp
+      POSTGRES_DB: be-orbitdeck
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     ports:
@@ -16,13 +16,13 @@ services:
       test: ["CMD-SHELL", "pg_isready -U root"]
 
   migration:
-    image: rishabh75/be-templateapp
+    image: rishabh75/be-orbitdeck
     container_name: migration
     env_file:
       - .env
     environment:
       - PORT=9069
-      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-templateapp
+      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-orbitdeck
     depends_on:
       - postgres
     command: ["npm", "run", "migrate"]
@@ -34,7 +34,7 @@ services:
       - "6379:6379"
 
   internal-server:
-    image: rishabh75/be-templateapp
+    image: rishabh75/be-orbitdeck
     container_name: internal-server
     depends_on:
       - postgres
@@ -48,7 +48,7 @@ services:
       - MODE=server
       - SERVER_TYPE=internal
       - PORT=9069
-      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-templateapp
+      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-orbitdeck
       - REDIS_HOST=redis
     command: ["node", "index.js"]
     healthcheck:
@@ -70,7 +70,7 @@ services:
       - WORKER_TYPE=email
       - QUEUE_NAME=EMAIL_WORKER_QUEUE_1
       - WORKER_CONCURRENCY=5
-      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-templateapp
+      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-orbitdeck
       - REDIS_HOST=redis
     command: ["node", "index.js"]
     scale: 5
@@ -86,7 +86,7 @@ services:
       - redis
     environment:
       - MODE=cron
-      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-templateapp
+      - POSTGRES_BILL_SPLIT_READ_WRITE=postgres://root:root@postgres:5432/be-orbitdeck
       - REDIS_HOST=redis
     command: ["node", "index.js"]
 

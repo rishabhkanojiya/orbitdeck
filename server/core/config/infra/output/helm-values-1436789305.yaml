@@ -5,7 +5,7 @@ components:
       - key: SERVER_TYPE
         value: USER
     image:
-      repository: rishabh75/templateapp-user
+      repository: rishabh75/orbitdeck-user
       tag: latest
     name: user
     replicaCount: "1"

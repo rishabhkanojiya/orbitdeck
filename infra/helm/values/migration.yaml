@@ -18,7 +18,7 @@ COMPONENT_DEFINITION:
     env:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
-      POSTGRES_DB: "be-templateapp"
+      POSTGRES_DB: "be-orbitdeck"
     volume:
       path: /var/lib/postgresql/data
       subPath: postgres
@@ -43,7 +43,7 @@ COMPONENT_DEFINITION:
     name: user
     replicaCount: 0
     image:
-      repository: rishabh75/templateapp-user
+      repository: rishabh75/orbitdeck-user
       tag: latest
     resources:
       requests:
@@ -61,7 +61,7 @@ COMPONENT_DEFINITION:
     name: email
     replicaCount: 0
     image:
-      repository: rishabh75/templateapp-email
+      repository: rishabh75/orbitdeck-email
       tag: latest
     resources:
       requests:
@@ -80,7 +80,7 @@ COMPONENT_DEFINITION:
     name: python
     replicaCount: 0
     image:
-      repository: rishabh75/templateapp-python
+      repository: rishabh75/orbitdeck-python
       tag: latest
     resources:
       requests:
@@ -98,7 +98,7 @@ jobs:
     backoffLimit: 1
     enabled: true
     image:
-      repository: rishabh75/templateapp-internal-migration
+      repository: rishabh75/orbitdeck-internal-migration
       tag: latest
       pullPolicy: IfNotPresent
     resources:

@@ -1,6 +1,6 @@
 @hostname = localhost
 @port = 8080
-# @host = templateapp.app/api/v1.0
+# @host = orbitdeck.app/api/v1.0
 @host = {{hostname}}:{{port}}
 
 @contentType = application/json

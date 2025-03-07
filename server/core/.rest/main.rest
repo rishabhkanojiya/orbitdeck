@@ -1,7 +1,7 @@
 @hostname = localhost
 @port1 = 8080
 @port = 8081
-# @host = templateapp.app/api/v1.0
+# @host = orbitdeck.app/api/v1.0
 @host = {{hostname}}:{{port}}
 
 @contentType = application/json
@@ -54,7 +54,7 @@ Authorization: Bearer {{login_token}}
     {
       "name": "user",
       "image": {
-        "repository": "rishabh75/templateapp-user",
+        "repository": "rishabh75/orbitdeck-user",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -82,7 +82,7 @@ Authorization: Bearer {{login_token}}
     }
   ],
   "ingress": {
-        "host": "templateapp.app"
+        "host": "orbitdeck.app"
   }
 }
 
@@ -125,14 +125,14 @@ Authorization: Bearer {{login_token}}
         },
         {
           "key": "POSTGRES_DB",
-          "value": "be-templateapp"
+          "value": "be-orbitdeck"
         }
       ]
     },
     {
       "name": "user",
       "image": {
-        "repository": "rishabh75/templateapp-user",
+        "repository": "rishabh75/orbitdeck-user",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -161,7 +161,7 @@ Authorization: Bearer {{login_token}}
     {
       "name": "client",
       "image": {
-        "repository": "rishabh75/templateapp-client",
+        "repository": "rishabh75/orbitdeck-client",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -179,7 +179,7 @@ Authorization: Bearer {{login_token}}
       "env": [
         {
           "key": "API_URL",
-          "value": "https://templateapp.app/api/user"
+          "value": "https://orbitdeck.app/api/user"
         },
         {
           "key": "ENV",
@@ -193,7 +193,7 @@ Authorization: Bearer {{login_token}}
     }
   ],
   "ingress": {
-        "host": "templateapp.app"
+        "host": "orbitdeck.app"
   }
 }
 
@@ -236,14 +236,14 @@ Authorization: Bearer {{login_token}}
         },
         {
           "key": "POSTGRES_DB",
-          "value": "be-templateapp"
+          "value": "be-orbitdeck"
         }
       ]
     },
     {
       "name": "user",
       "image": {
-        "repository": "rishabh75/templateapp-user",
+        "repository": "rishabh75/orbitdeck-user",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -272,7 +272,7 @@ Authorization: Bearer {{login_token}}
     {
       "name": "client",
       "image": {
-        "repository": "rishabh75/templateapp-client",
+        "repository": "rishabh75/orbitdeck-client",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -290,7 +290,7 @@ Authorization: Bearer {{login_token}}
       "env": [
         {
           "key": "API_URL",
-          "value": "https://templateapp.app/api/user"
+          "value": "https://orbitdeck.app/api/user"
         },
         {
           "key": "ENV",
@@ -305,7 +305,7 @@ Authorization: Bearer {{login_token}}
   ],
   "ingress": [
         {
-            "host": "templateapp.app",
+            "host": "orbitdeck.app",
             "path": "/api/user/?(.*)",
             "serviceName": "user-svc",
             "servicePort": 9069

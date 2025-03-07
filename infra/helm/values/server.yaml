@@ -18,7 +18,7 @@ COMPONENT_DEFINITION:
     env:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
-      POSTGRES_DB: "be-templateapp"
+      POSTGRES_DB: "be-orbitdeck"
       # Comment if using PSQL server setup
     volume:
       path: /var/lib/postgresql/data
@@ -44,7 +44,7 @@ COMPONENT_DEFINITION:
     name: user
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-user
+      repository: rishabh75/orbitdeck-user
       tag: latest
     resources:
       requests:
@@ -62,7 +62,7 @@ COMPONENT_DEFINITION:
     name: email
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-email
+      repository: rishabh75/orbitdeck-email
       tag: latest
     resources:
       requests:
@@ -81,7 +81,7 @@ COMPONENT_DEFINITION:
     name: python
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-python
+      repository: rishabh75/orbitdeck-python
       tag: latest
     resources:
       requests:
@@ -96,7 +96,7 @@ COMPONENT_DEFINITION:
     name: client
     replicaCount: 1
     image:
-      repository: rishabh75/templateapp-client-prod
+      repository: rishabh75/orbitdeck-client-prod
       tag: latest
     resources:
       requests:
@@ -132,7 +132,7 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
         - www.k8.relise.live
       secretName: k8-relise-live-tls
     # rules:
-    #   # - host: templateapp.app
+    #   # - host: orbitdeck.app
     #   - paths:
     #       - path: /api/user/?(.*)
     #         pathType: ImplementationSpecific
@@ -210,7 +210,7 @@ jobs:
     #   helm.sh/hook-weight: "0"
     #   helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded,hook-failed
     image:
-      repository: rishabh75/templateapp-internal-migration
+      repository: rishabh75/orbitdeck-internal-migration
       tag: latest
       pullPolicy: IfNotPresent
     resources:
@@ -235,7 +235,7 @@ cronJobs:
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 1
     concurrencyPolicy: "Forbid"
-    image: rishabh75/templateapp-email-cron
+    image: rishabh75/orbitdeck-email-cron
     resources:
       requests:
         cpu: "1"

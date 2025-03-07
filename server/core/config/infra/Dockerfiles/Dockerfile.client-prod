@@ -11,8 +11,8 @@ RUN npm run build
 # serve environment
 FROM node:16-alpine
 
-RUN mkdir -p /srv/fe-templateapp
-WORKDIR /srv/fe-templateapp
+RUN mkdir -p /srv/fe-orbitdeck
+WORKDIR /srv/fe-orbitdeck
 COPY server.js ./
 # COPY --from=build /app/build ./build
 # COPY --from=build /app/node_modules /node_modules

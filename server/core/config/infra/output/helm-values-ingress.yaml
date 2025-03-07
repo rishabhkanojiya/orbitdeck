@@ -3,7 +3,7 @@ components:
       MODE: server
       SERVER_TYPE: USER
     image:
-      repository: rishabh75/templateapp-user
+      repository: rishabh75/orbitdeck-user
       tag: latest
     name: user
     replicaCount: 1
@@ -22,7 +22,7 @@ ingress:
     nginx.ingress.kubernetes.io/use-regex: "true"
   ingressClassName: nginx
   rules:
-    - host: templateapp.app
+    - host: orbitdeck.app
       paths:
         - backend:
             serviceName: -svc

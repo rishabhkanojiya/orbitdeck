@@ -4,7 +4,7 @@ kind: Config
 .COMMON_ARTIFACTS:
   ARTIFACTS_DEFINITION:
     - &USER
-      image: rishabh75/templateapp-user
+      image: rishabh75/orbitdeck-user
       context: ../../server/node
       sync:
         manual:
@@ -13,10 +13,10 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.main
     - &VOTING
-      image: rishabh75/templateapp-python
+      image: rishabh75/orbitdeck-python
       context: ../../server/python
       requires:
-        - image: rishabh75/templateapp-internal-migration
+        - image: rishabh75/orbitdeck-internal-migration
           alias: MIGRATION
       sync:
         manual:
@@ -25,7 +25,7 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.python
     - &EMAIL
-      image: rishabh75/templateapp-email
+      image: rishabh75/orbitdeck-email
       context: ../../server/node
       sync:
         manual:
@@ -34,7 +34,7 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.email
     - &CRON
-      image: rishabh75/templateapp-email-cron
+      image: rishabh75/orbitdeck-email-cron
       context: ../../server/node
       sync:
         manual:
@@ -43,7 +43,7 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.cron
     - &CLIENT
-      image: rishabh75/templateapp-client
+      image: rishabh75/orbitdeck-client
       context: ../../client/
       sync:
         manual:
@@ -52,7 +52,7 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.client
     - &CLIENT-PROD
-      image: rishabh75/templateapp-client-prod
+      image: rishabh75/orbitdeck-client-prod
       context: ../../client/
       sync:
         manual:
@@ -61,7 +61,7 @@ kind: Config
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.client-prod
     - &MIGRATE
-      image: rishabh75/templateapp-internal-migration
+      image: rishabh75/orbitdeck-internal-migration
       context: ../../server/node
       docker:
         dockerfile: ../Dockerfiles/Dockerfile.migrate
@@ -95,7 +95,7 @@ kind: Config
 # deploy:
 #   helm:
 #     releases:
-#       - name: templateapp-release
+#       - name: orbitdeck-release
 #         chartPath: ../helm/
 #         createNamespace: true
 #         valuesFiles:
@@ -106,16 +106,16 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: templateapp-dev-release
+          # - name: orbitdeck-dev-release
           #   chartPath: ../helm/
-          #   namespace: templateapp-dev
+          #   namespace: orbitdeck-dev
           #   createNamespace: true
           #   wait: true
           #   valuesFiles:
           #     - ../helm/values/migration.yaml
-          - name: templateapp-dev-release
+          - name: orbitdeck-dev-release
             chartPath: ../helm/
-            namespace: templateapp-dev
+            namespace: orbitdeck-dev
             createNamespace: true
             wait: true
             valuesFiles:
@@ -131,16 +131,16 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: templateapp-prod-release
+          # - name: orbitdeck-prod-release
           #   chartPath: ../helm/
-          #   namespace: templateapp-prod
+          #   namespace: orbitdeck-prod
           #   createNamespace: true
           #   wait: true
           #   valuesFiles:
           #     - ../helm/values/migration.yaml
-          - name: templateapp-prod-release
+          - name: orbitdeck-prod-release
             chartPath: ../helm/
-            namespace: templateapp-prod
+            namespace: orbitdeck-prod
             createNamespace: true
             wait: true
             valuesFiles:
@@ -157,16 +157,16 @@ profiles:
     deploy:
       helm:
         releases:
-          # - name: templateapp-server-release
+          # - name: orbitdeck-server-release
           #   chartPath: ../helm/
-          #   namespace: templateapp-server
+          #   namespace: orbitdeck-server
           #   createNamespace: true
           #   wait: true
           #   valuesFiles:
           #     - ../helm/values/migration.yaml
-          - name: templateapp-server-release
+          - name: orbitdeck-server-release
             chartPath: ../helm/
-            namespace: templateapp-server
+            namespace: orbitdeck-server
             createNamespace: true
             wait: true
             valuesFiles:
