@@ -1,10 +1,7 @@
 COMPONENT_DEFINITION:
-  - &INTERNAL-POSTGRES
-    name: internal-postgres
+  - &AUTH-POSTGRES
+    name: auth-postgres
     replicaCount: 1
-    # hooks:
-    #   helm.sh/resource-policy: keep
-    #   helm.sh/hook-delete-policy: before-hook-creation
     image:
       repository: postgres:14.10-alpine3.19
       tag: latest
@@ -21,11 +18,35 @@ COMPONENT_DEFINITION:
     env:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "root"
-      POSTGRES_DB: "be-orbitdeck"
+      POSTGRES_DB: "auth"
     volume:
       path: /var/lib/postgresql/data
-      subPath: postgres
-      claimName: postgres-pvc
+      subPath: auth-postgres
+      claimName: auth-postgres-pvc
+  - &CORE-POSTGRES
+    name: core-postgres
+    replicaCount: 1
+    image:
+      repository: postgres:14.10-alpine3.19
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "db"
+      port: 5432
+    env:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "core"
+    volume:
+      path: /var/lib/postgresql/data
+      subPath: core-postgres
+      claimName: core-postgres-pvc
   - &EMAIL-REDIS
     name: email-redis
     replicaCount: 1
@@ -59,21 +80,25 @@ COMPONENT_DEFINITION:
       port: 9069
     env:
       SERVER_PORT: 9069
-  # - &CORE
-  #   name: core
-  #   replicaCount: 1
-  #   image:
-  #     repository: rishabh75/orbitdeck-core
-  #     tag: latest
-  #   resources:
-  #     requests:
-  #       cpu: "1"
-  #       memory: "500Mi"
-  #     limits:
-  #       cpu: "1"
-  #       memory: "500Mi"
-  #   service:
-  #     port: 9069
+      MODE: server
+  - &CORE
+    name: core
+    replicaCount: 1
+    image:
+      repository: rishabh75/orbitdeck-core
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+    env:
+      SERVER_PORT: 9069
+      MODE: server
   - &EMAIL
     name: email
     replicaCount: 1
@@ -88,11 +113,44 @@ COMPONENT_DEFINITION:
         cpu: "1"
         memory: "500Mi"
     env:
-      MODE: "worker"
-      SERVER_TYPE: "email-worker"
+      MODE: worker
+      WORKER_TYPE: verify-email
       EMAIL_SENDER_NAME: Nikki Parker
       EMAIL_SENDER_ADDRESS: nikki96@ethereal.email
       EMAIL_SENDER_PASSWORD: vyPM1PtxuRee7MGZZe
+  - &GENERATOR
+    name: generate
+    replicaCount: 1
+    serviceAccount: true
+    image:
+      repository: rishabh75/orbitdeck-generate
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: worker
+      WORKER_TYPE: generate-helm
+  - &UNINSTALLER
+    name: uninstall
+    replicaCount: 1
+    image:
+      repository: rishabh75/orbitdeck-uninstall
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    env:
+      MODE: worker
+      WORKER_TYPE: uninstall-helm
 
 INGRESS_DEFINITION: &INGRESS_DEFINITION
   - &DEV_INGRESS
@@ -113,11 +171,11 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
             backend:
               serviceName: core-svc
               servicePort: 9069
-          - path: /?(.*)
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: client-svc
-              servicePort: 3000
+          # - path: /?(.*)
+          #   pathType: ImplementationSpecific
+          #   backend:
+          #     serviceName: client-svc
+          #     servicePort: 3000
 
 # jobs:
 #   - name: internal-migration
@@ -140,8 +198,10 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
 #       SERVER_TYPE: "internal"
 
 volumes:
-  - name: postgres
-    storage: 1Gi
+  - name: auth-postgres
+    storage: 500Mi
+  - name: core-postgres
+    storage: 500Mi
 
 # cronJobs:
 #   - name: email-cron-job
@@ -159,11 +219,14 @@ volumes:
 #         memory: "500Mi"
 
 DEV_COMPONENTS: &DEV_COMPONENTS
-  - *INTERNAL-POSTGRES
+  - *AUTH-POSTGRES
+  - *CORE-POSTGRES
   - *EMAIL-REDIS
   - *AUTH
-  # - *CORE
+  - *CORE
   - *EMAIL
+  - *GENERATOR
+  - *UNINSTALLER
   # - *CLIENT
 
 components: *DEV_COMPONENTS

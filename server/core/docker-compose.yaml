@@ -17,7 +17,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_CONN=postgresql://root:secret@postgres:5432/core?sslmode=disable
+      - CORE_POSTGRES_BILL_SPLIT_READ_WRITE=postgresql://root:secret@postgres:5432/core?sslmode=disable
       - REDIS_ADDRESS=redis:6379
       - SERVER_PORT=8080
     depends_on:

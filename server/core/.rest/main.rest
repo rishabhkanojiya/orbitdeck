@@ -1,32 +1,33 @@
 @hostname = localhost
 @port1 = 8080
 @port = 8081
-# @host = orbitdeck.app/api/v1.0
-@host = {{hostname}}:{{port}}
+@host = orbitdeck.app/api/core
+@authHost = orbitdeck.app/api/auth
+# @host = {{hostname}}:{{port}}
 
 @contentType = application/json
 
 
 ###
 # @name Register
-POST http://{{hostname}}:{{port1}}/users
+POST http://{{authHost}}/users
 Content-Type: {{contentType}}
 
 {
     "full_name":"Rishabh",
-    "username": "rk3",
-    "email": "rk3@flow.com",
+    "username": "rk1",
+    "email": "rk1@flow.com",
     "password": "Qwe@123456"
 }
 
 
 ###
 # @name login
-POST http://{{hostname}}:{{port1}}/users/login
+POST http://{{authHost}}/users/login
 Content-Type: {{contentType}}
 
 {
-    "username": "rk3",
+    "username": "rk1",
     "password": "Qwe@123456"
 }
 
@@ -34,11 +35,12 @@ Content-Type: {{contentType}}
 
 
 ###
-GET http://{{host}}/deployment/83
+GET http://{{host}}/deployment/1
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
+
 ###
-POST http://{{host}}/deployment/83
+POST http://{{host}}/deployment/1
 Content-Type: {{contentType}}
 Authorization: Bearer {{login_token}}
 

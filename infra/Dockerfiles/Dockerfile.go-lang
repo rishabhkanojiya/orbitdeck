@@ -16,7 +16,5 @@ COPY start.sh .
 RUN chmod +x /app/start.sh
 COPY db/migration ./db/migration
 
-RUN ls -l /app
-
-CMD [ "/app/main" ]
-ENTRYPOINT [ "/app/start.sh" ]
+EXPOSE 9069
+ENTRYPOINT ["/app/main" ]

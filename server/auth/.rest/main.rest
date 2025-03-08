@@ -1,7 +1,7 @@
 @hostname = localhost
 @port = 8080
-# @host = orbitdeck.app/api/v1.0
-@host = {{hostname}}:{{port}}
+@host = orbitdeck.app/api/auth
+# @host = {{hostname}}:{{port}}
 
 @contentType = application/json
 

@@ -12,6 +12,5 @@ COPY .env .
 COPY start.sh .
 COPY db/migration ./db/migration
 
-EXPOSE 8080
-CMD [ "/app/main" ]
-ENTRYPOINT [ "/app/start.sh" ]
+EXPOSE 9069
+ENTRYPOINT ["/app/main" ]

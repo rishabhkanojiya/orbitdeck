@@ -5,9 +5,9 @@ metadata:
 data:
   DB_DRIVER: postgres
   # DB_CONN: postgresql://root:root@localhost:5432/auth?sslmode=disable
-  SERVER_ADDRESS: localhost
+  SERVER_ADDRESS: 0.0.0.0
   TOKEN_SYMMETRIC_KEY: "6d2e4c40-c5f6-4b95-84d6-6f5a4554"
   ACCESS_TOKEN_DURATION: 15m
   REFRESH_TOKEN_DURATION: 24h
-  REDIS_ADDRESS: 0.0.0.0:6379
+  REDIS_ADDRESS: email-redis-svc:6379
   MIGRATION_URL: file://db/migration

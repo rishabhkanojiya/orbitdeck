@@ -11,7 +11,7 @@ kind: Config
           - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.go-lang
+        dockerfile: ../../server/auth/Dockerfile
     - &CORE
       image: rishabh75/orbitdeck-core
       context: ../../server/core
@@ -20,7 +20,7 @@ kind: Config
           - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.go-lang
+        dockerfile: ../../server/core/Dockerfile
     - &EMAIL
       image: rishabh75/orbitdeck-email
       context: ../../server/auth
@@ -29,7 +29,25 @@ kind: Config
           - src: /**/*.go
             dest: .
       docker:
-        dockerfile: ../Dockerfiles/Dockerfile.go-lang
+        dockerfile: ../../server/auth/Dockerfile
+    - &GENERATOR
+      image: rishabh75/orbitdeck-uninstall
+      context: ../../server/core
+      sync:
+        manual:
+          - src: /**/*.go
+            dest: .
+      docker:
+        dockerfile: ../../server/core/Dockerfile
+    - &UNINSTALLER
+      image: rishabh75/orbitdeck-generate
+      context: ../../server/core
+      sync:
+        manual:
+          - src: /**/*.go
+            dest: .
+      docker:
+        dockerfile: ../../server/core/Dockerfile
     # - &CLIENT
     #   image: rishabh75/orbitdeck-client
     #   context: ../../client/
@@ -63,6 +81,8 @@ kind: Config
       - *AUTH
       - *CORE
       - *EMAIL
+      - *GENERATOR
+      - *UNINSTALLER
       # - *CLIENT
     PROD_ARTIFACTS: &PROD_ARTIFACTS # - *MIGRATE
       - *AUTH

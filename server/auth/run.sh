@@ -1,9 +1,9 @@
 #!/bin/sh
 
 export DB_DRIVER=postgres
-export DB_CONN=postgresql://root:root@localhost:5432/auth?sslmode=disable
+export AUTH_POSTGRES_BILL_SPLIT_READ_WRITE=postgresql://root:root@localhost:5432/auth?sslmode=disable
 export SERVER_ADDRESS=localhost
-export SERVER_PORT=8080
+export SERVER_PORT=9069
 export TOKEN_SYMMETRIC_KEY=6d2e4c40-c5f6-4b95-84d6-6f5a4554
 export ACCESS_TOKEN_DURATION=15m
 export REFRESH_TOKEN_DURATION=24h

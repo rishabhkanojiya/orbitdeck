@@ -1,0 +1,43 @@
+{{- range .Values.components }}
+{{- if .serviceAccount }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ printf "%s-sa" .name }}
+  namespace: orbitdeck-dev
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ printf "%s-role" .name }}
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "create"]
+  - apiGroups: [""]
+    resources: ["pods/exec", "pods/portforward"]
+    verbs: ["create"]
+  - apiGroups: ["", "apps", "batch", "extensions", "networking.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ printf "%s-binding" .name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ printf "%s-sa" .name }}
+    namespace: orbitdeck-dev
+roleRef:
+  kind: ClusterRole
+  name: {{ printf "%s-role" .name }}
+  apiGroup: rbac.authorization.k8s.io
+
+---
+{{- end }}
+{{- end }}

@@ -26,12 +26,12 @@ func main() {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
 
-	conn, err := sql.Open(configs.DB_DRIVER, configs.DB_CONN)
+	conn, err := sql.Open(configs.DB_DRIVER, configs.AUTH_POSTGRES_BILL_SPLIT_READ_WRITE)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db")
 	}
 
-	runDBMigration(configs.MIGRATION_URL, configs.DB_CONN)
+	runDBMigration(configs.MIGRATION_URL, configs.AUTH_POSTGRES_BILL_SPLIT_READ_WRITE)
 
 	store := db.NewStore(conn)
 
@@ -80,6 +80,8 @@ func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start task processor")
 	}
+
+	select {}
 }
 
 func runGinServer(config config.Config, store db.Store, taskDistributor worker.TaskDistributor) {
@@ -87,6 +89,8 @@ func runGinServer(config config.Config, store db.Store, taskDistributor worker.T
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}
+
+	log.Debug().Str("EP", fmt.Sprintf("%s:%d", config.SERVER_ADDRESS, config.SERVER_PORT))
 
 	err = server.Start(fmt.Sprintf("%s:%d", config.SERVER_ADDRESS, config.SERVER_PORT))
 

@@ -8,20 +8,20 @@ import (
 )
 
 type Config struct {
-	DB_DRIVER              string        `mapstructure:"DB_DRIVER"`
-	DB_CONN                string        `mapstructure:"DB_CONN"`
-	SERVER_ADDRESS         string        `mapstructure:"SERVER_ADDRESS"`
-	SERVER_PORT            int           `mapstructure:"SERVER_PORT"`
-	MODE                   string        `mapstructure:"MODE"`
-	WORKER_TYPE            string        `mapstructure:"WORKER_TYPE"`
-	TOKEN_SYMMETRIC_KEY    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
-	ACCESS_TOKEN_DURATION  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
-	REFRESH_TOKEN_DURATION time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
-	REDIS_ADDRESS          string        `mapstructure:"REDIS_ADDRESS"`
-	MIGRATION_URL          string        `mapstructure:"MIGRATION_URL"`
-	EMAIL_SENDER_NAME      string        `mapstructure:"EMAIL_SENDER_NAME"`
-	EMAIL_SENDER_ADDRESS   string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
-	EMAIL_SENDER_PASSWORD  string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
+	DB_DRIVER                           string        `mapstructure:"DB_DRIVER"`
+	CORE_POSTGRES_BILL_SPLIT_READ_WRITE string        `mapstructure:"CORE_POSTGRES_BILL_SPLIT_READ_WRITE"`
+	SERVER_ADDRESS                      string        `mapstructure:"SERVER_ADDRESS"`
+	SERVER_PORT                         int           `mapstructure:"SERVER_PORT"`
+	MODE                                string        `mapstructure:"MODE"`
+	WORKER_TYPE                         string        `mapstructure:"WORKER_TYPE"`
+	TOKEN_SYMMETRIC_KEY                 string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	ACCESS_TOKEN_DURATION               time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	REFRESH_TOKEN_DURATION              time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+	REDIS_ADDRESS                       string        `mapstructure:"REDIS_ADDRESS"`
+	MIGRATION_URL                       string        `mapstructure:"MIGRATION_URL"`
+	EMAIL_SENDER_NAME                   string        `mapstructure:"EMAIL_SENDER_NAME"`
+	EMAIL_SENDER_ADDRESS                string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
+	EMAIL_SENDER_PASSWORD               string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 }
 
 func LoadConfig(path string, name string) (config Config, err error) {
@@ -43,7 +43,7 @@ func LoadConfig(path string, name string) (config Config, err error) {
 func bindEnvironmentVariables() {
 	// Explicitly bind each environment variable to its corresponding field
 	viper.BindEnv("DB_DRIVER")
-	viper.BindEnv("DB_CONN")
+	viper.BindEnv("CORE_POSTGRES_BILL_SPLIT_READ_WRITE")
 	viper.BindEnv("SERVER_ADDRESS")
 	viper.BindEnv("SERVER_PORT")
 	viper.BindEnv("MODE")
@@ -61,7 +61,7 @@ func bindEnvironmentVariables() {
 func setDefaults() {
 	viper.SetDefault("DB_DRIVER", "postgres")
 	viper.SetDefault("SERVER_ADDRESS", "0.0.0.0")
-	viper.SetDefault("SERVER_PORT", 8080)
+	viper.SetDefault("SERVER_PORT", 9069)
 	viper.SetDefault("MODE", "development")
 	viper.SetDefault("WORKER_TYPE", "api")
 	viper.SetDefault("ACCESS_TOKEN_DURATION", time.Hour*24)
@@ -73,8 +73,8 @@ func maskSensitiveInfo(config Config) Config {
 	if config.TOKEN_SYMMETRIC_KEY != "" {
 		maskedConfig.TOKEN_SYMMETRIC_KEY = "[REDACTED]"
 	}
-	if config.DB_CONN != "" {
-		maskedConfig.DB_CONN = "[REDACTED]"
+	if config.CORE_POSTGRES_BILL_SPLIT_READ_WRITE != "" {
+		maskedConfig.CORE_POSTGRES_BILL_SPLIT_READ_WRITE = "[REDACTED]"
 	}
 	if config.EMAIL_SENDER_PASSWORD != "" {
 		maskedConfig.EMAIL_SENDER_PASSWORD = "[REDACTED]"

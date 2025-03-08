@@ -26,6 +26,9 @@ spec:
       labels:
         app: {{ .name }}
     spec:
+      {{- if .serviceAccount }}
+      serviceAccountName: {{ printf "%s-sa" .name }}
+      {{- end }}
       containers:
         - name: {{ .name }}
           image: "{{ .image.repository }}"
