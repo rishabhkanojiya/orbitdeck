@@ -1,0 +1,7 @@
+node_modules
+build
+stats.json
+.DS_Store
+package-lock.json
+# jetbrains
+.idea

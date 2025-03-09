@@ -48,15 +48,15 @@ kind: Config
             dest: .
       docker:
         dockerfile: ../../server/core/Dockerfile
-    # - &CLIENT
-    #   image: rishabh75/orbitdeck-client
-    #   context: ../../client/
-    #   sync:
-    #     manual:
-    #       - src: src/**/*.js
-    #         dest: .
-    #   docker:
-    #     dockerfile: ../Dockerfiles/Dockerfile.client
+    - &CLIENT
+      image: rishabh75/orbitdeck-client
+      context: ../../client/
+      sync:
+        manual:
+          - src: src/**/*.js
+            dest: .
+      docker:
+        dockerfile: ../Dockerfiles/Dockerfile.client
     # - &CLIENT-PROD
     #   image: rishabh75/orbitdeck-client-prod
     #   context: ../../client/
@@ -83,7 +83,7 @@ kind: Config
       - *EMAIL
       - *GENERATOR
       - *UNINSTALLER
-      # - *CLIENT
+      - *CLIENT
     PROD_ARTIFACTS: &PROD_ARTIFACTS # - *MIGRATE
       - *AUTH
       - *CORE

@@ -151,6 +151,25 @@ COMPONENT_DEFINITION:
     env:
       MODE: worker
       WORKER_TYPE: uninstall-helm
+  - &CLIENT
+    name: client
+    replicaCount: 1
+    image:
+      repository: rishabh75/orbitdeck-client
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "1000Mi"
+      limits:
+        cpu: "1"
+        memory: "1000Mi"
+    service:
+      port: 3000
+    env:
+      API_URL: "https://orbitdeck.app/api/user"
+      ENV: "development"
+      PORT: 3000
 
 INGRESS_DEFINITION: &INGRESS_DEFINITION
   - &DEV_INGRESS
@@ -171,11 +190,11 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
             backend:
               serviceName: core-svc
               servicePort: 9069
-          # - path: /?(.*)
-          #   pathType: ImplementationSpecific
-          #   backend:
-          #     serviceName: client-svc
-          #     servicePort: 3000
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: client-svc
+              servicePort: 3000
 
 # jobs:
 #   - name: internal-migration
@@ -227,7 +246,7 @@ DEV_COMPONENTS: &DEV_COMPONENTS
   - *EMAIL
   - *GENERATOR
   - *UNINSTALLER
-  # - *CLIENT
+  - *CLIENT
 
 components: *DEV_COMPONENTS
 
