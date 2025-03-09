@@ -1,5 +1,5 @@
 @hostname = localhost
-@port = 8080
+@port = 9069
 @host = orbitdeck.app/api/auth
 # @host = {{hostname}}:{{port}}
 
@@ -13,8 +13,8 @@ Content-Type: {{contentType}}
 
 {
     "full_name":"Rishabh",
-    "username": "rk5",
-    "email": "rk5@flow.com",
+    "username": "rk1",
+    "email": "rk1@flow.com",
     "password": "Qwe@123456"
 }
 
@@ -25,7 +25,7 @@ POST http://{{host}}/users/login
 Content-Type: {{contentType}}
 
 {
-    "username": "rk5",
+    "username": "rk1",
     "password": "Qwe@123456"
 }
 

@@ -4,12 +4,10 @@ const groupUrl = "/groups";
 const memberUrl = "/members";
 
 export const URLS = {
-    registerUser: `${environment.API_URL}/v1.0/user/register`,
-    loginUser: `${environment.API_URL}/v1.0/user/login`,
-    logoutUser: `${environment.API_URL}/v1.0/user/logout`,
-    forgotPassword: `${environment.API_URL}/v1.0/user/forgot-password`,
-    resetPassword: `${environment.API_URL}/v1.0/user/reset-password`,
-    me: `${environment.API_URL}/v1.0/user/me`,
+    registerUser: `${environment.AUTH_API_URL}/users/register`,
+    loginUser: `${environment.AUTH_API_URL}/users/login`,
+    logoutUser: `${environment.AUTH_API_URL}/user/logout`,
+    resetPassword: `${environment.AUTH_API_URL}/users/renew_access`,
 
     groups: `${environment.API_URL}/v1.0${groupUrl}`,
     group: `${environment.API_URL}/v1.0${groupUrl}/:groupId`,

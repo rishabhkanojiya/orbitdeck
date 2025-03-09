@@ -80,9 +80,9 @@ kind: Config
     DEV_ARTIFACTS: &DEV_ARTIFACTS # - *MIGRATE
       - *AUTH
       - *CORE
-      - *EMAIL
-      - *GENERATOR
-      - *UNINSTALLER
+      # - *EMAIL
+      # - *GENERATOR
+      # - *UNINSTALLER
       - *CLIENT
     PROD_ARTIFACTS: &PROD_ARTIFACTS # - *MIGRATE
       - *AUTH

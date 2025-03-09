@@ -8,6 +8,7 @@ import (
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -46,6 +47,13 @@ func NewServer(config config.Config, store db.Store, taskDistributor worker.Task
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // Change this to specific origins if needed
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	// deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
 	deploymentRoutes := router.Group("/deployment")

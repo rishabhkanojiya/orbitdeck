@@ -167,7 +167,6 @@ COMPONENT_DEFINITION:
     service:
       port: 3000
     env:
-      API_URL: "https://orbitdeck.app/api/user"
       ENV: "development"
       PORT: 3000
 
@@ -243,9 +242,9 @@ DEV_COMPONENTS: &DEV_COMPONENTS
   - *EMAIL-REDIS
   - *AUTH
   - *CORE
-  - *EMAIL
-  - *GENERATOR
-  - *UNINSTALLER
+  # - *EMAIL
+  # - *GENERATOR
+  # - *UNINSTALLER
   - *CLIENT
 
 components: *DEV_COMPONENTS
