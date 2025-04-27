@@ -21,47 +21,47 @@ type renewAccessTokenResponse struct {
 func (server *Server) renewAccessToken(ctx *gin.Context) {
 	var req renewAccessTokenRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusBadRequest, err))
 		return
 	}
 
 	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
 	session, err := server.store.GetSession(ctx, refreshPayload.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			ctx.JSON(errorResponse(http.StatusNotFound, err))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 
 	if session.IsBlocked {
 		err := fmt.Errorf("blocked session")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
 	if session.Username != refreshPayload.Username {
 		err := fmt.Errorf("incorrect session user")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
 	if session.RefreshToken != req.RefreshToken {
 		err := fmt.Errorf("mismatched session token")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
 	if time.Now().After(session.ExpiresAt) {
 		err := fmt.Errorf("expired session")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
@@ -70,7 +70,7 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 		server.config.ACCESS_TOKEN_DURATION,
 	)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 

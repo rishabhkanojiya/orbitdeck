@@ -2,12 +2,13 @@ package api
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/util"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/worker"
+	"github.com/rs/zerolog/log"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -76,6 +77,7 @@ func (server *Server) setupRouter() {
 		AllowCredentials: true,
 	}))
 
+	// router.Use(middleware.ErrorHandler())
 	router.Use(LogCORSRejections())
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
@@ -88,6 +90,13 @@ func (server *Server) Start(address string) error {
 	return server.router.Run(address)
 }
 
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
+func errorResponse(status int, err error) (int, util.ErrorResponse) {
+	var customErr = &util.Error{
+		Status:  status,
+		Message: err.Error(),
+	}
+
+	errRet := util.FormatErrorResponse(customErr)
+
+	return status, errRet
 }
