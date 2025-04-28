@@ -108,16 +108,17 @@ const Register = ({ ShowPopupData, LoginData }) => {
                 <Title>Register</Title>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Input
-                        id="firstName"
-                        placeholder="First Name"
+                        id="full_name"
+                        placeholder="Full Name"
                         required
-                        {...register("firstName")}
+                        {...register("full_name")}
                     />
+
                     <Input
-                        id="lastName"
-                        placeholder="Last Name"
+                        id="username"
+                        placeholder="Username"
                         required
-                        {...register("lastName")}
+                        {...register("username")}
                     />
                     <Input
                         id="email"

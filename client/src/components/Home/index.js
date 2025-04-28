@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import FloatingIcons from "../FloatingIcons";
-import { PrimaryButton } from "../Button";
+import { Consume } from "../../context/Consumer";
+import { LoginContext } from "../../context";
+// import { DeploymentService } from "../../services/deployment.services";
 
+/* Styled Components */
 const PageWrapper = styled.div`
     width: 100%;
     min-height: 100vh;
@@ -49,7 +52,6 @@ const BackgroundBlob = styled.div`
     z-index: 0;
 `;
 
-/* Main Sections */
 const HeroSection = styled.section`
     width: 100%;
     padding: 120px 20px 60px;
@@ -81,7 +83,6 @@ const CTAButton = styled(Link)`
     background: ${({ theme }) => theme.colors.gradientPrimary};
     border: none;
     border-radius: ${({ theme }) => theme.borderRadius.full};
-    /* box-shadow: ${({ theme }) => theme.colors.glowPrimary}; */
     text-decoration: none;
     transition: ${({ theme }) => theme.transitions.default};
 
@@ -111,19 +112,39 @@ const FeatureCard = styled.div`
     border-radius: ${({ theme }) => theme.borderRadius.lg};
     width: 280px;
     text-align: center;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
     background-image: linear-gradient(#1c1c1e, #1c1c1e),
         ${({ theme }) => theme.colors.gradientPrimary};
     box-shadow: ${({ theme }) => theme.shadows.md};
     transition: ${({ theme }) => theme.transitions.default};
+    opacity: ${({ comingSoon }) => (comingSoon ? 0.6 : 1)};
+    pointer-events: ${({ comingSoon }) => (comingSoon ? "none" : "auto")};
 
     &:hover {
-        box-shadow: ${({ theme }) => theme.colors.glowPrimary};
-        transform: translateY(-8px) scale(1.03);
+        box-shadow: ${({ theme, comingSoon }) =>
+            comingSoon ? theme.shadows.md : theme.colors.glowPrimary};
+        transform: ${({ comingSoon }) =>
+            comingSoon ? "none" : "translateY(-8px) scale(1.03)"};
     }
 `;
+
+const ComingSoonBadge = styled.div`
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.textPrimary};
+    padding: 4px 8px;
+    border-radius: ${({ theme }) => theme.borderRadius.sm};
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 8px ${({ theme }) => theme.colors.primary};
+`;
+
 const FeatureTitle = styled.h3`
     margin-bottom: 16px;
     font-size: 24px;
@@ -138,9 +159,41 @@ const FeatureDesc = styled.p`
     margin-top: 12px;
 `;
 
-const FeatureIcon = styled.div`
-    font-size: 36px;
-    margin-bottom: 16px;
+const DeploymentsSection = styled.section`
+    width: 100%;
+    max-width: 1200px;
+    padding: 60px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+`;
+
+const DeploymentCard = styled.div`
+    background-color: ${({ theme }) => theme.colors.surface};
+    padding: 24px;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    width: 280px;
+    text-align: center;
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:hover {
+        box-shadow: ${({ theme }) => theme.colors.glowPrimary};
+        transform: translateY(-5px);
+    }
+`;
+
+const DeploymentName = styled.h3`
+    font-size: 20px;
+    margin-bottom: 12px;
+`;
+
+const DeploymentStatus = styled.p`
+    font-size: 14px;
+    color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 const CTASection = styled.section`
@@ -164,7 +217,26 @@ const Footer = styled.footer`
     color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
-const HomePage = () => {
+const HomePage = ({ LoginData }) => {
+    const [deployments, setDeployments] = useState([]);
+
+    const fetchDeployments = async () => {
+        try {
+            // const res = await DeploymentService.getMyDeployments(); // your API call
+            // setDeployments(res.data.deployments);
+        } catch (err) {
+            console.error("Failed to fetch deployments", err);
+        }
+    };
+
+    useEffect(() => {
+        if (LoginData?.data?.username) {
+            fetchDeployments();
+        }
+    }, [LoginData?.data?.username]);
+
+    const isLoggedIn = !!LoginData?.data?.username;
+
     return (
         <>
             <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
@@ -178,12 +250,40 @@ const HomePage = () => {
                 <HeroSection>
                     <HeroTitle>Deploy Faster. Scale Smarter.</HeroTitle>
                     <HeroSubtitle>
-                        The easiest platform to launch, manage, and scale your
-                        apps effortlessly.
+                        {isLoggedIn
+                            ? "Manage your deployments effortlessly with OrbitDeck."
+                            : "The easiest platform to launch, manage, and scale your apps effortlessly."}
                     </HeroSubtitle>
-                    <CTAButton to="/auth/register">Get Started</CTAButton>
+                    {isLoggedIn ? (
+                        <CTAButton to="/deploy">Deploy New App</CTAButton>
+                    ) : (
+                        <CTAButton to="/auth/login">Get Started</CTAButton>
+                    )}
                 </HeroSection>
 
+                {/* Logged-in: Deployments Section */}
+                {isLoggedIn && (
+                    <DeploymentsSection>
+                        {deployments.length > 0 ? (
+                            deployments.map((deployment) => (
+                                <DeploymentCard key={deployment.id}>
+                                    <DeploymentName>
+                                        {deployment.name}
+                                    </DeploymentName>
+                                    <DeploymentStatus>
+                                        {deployment.status}
+                                    </DeploymentStatus>
+                                </DeploymentCard>
+                            ))
+                        ) : (
+                            <DeploymentStatus>
+                                No deployments found. Start by deploying one!
+                            </DeploymentStatus>
+                        )}
+                    </DeploymentsSection>
+                )}
+
+                {/* Logged-out: Features Section */}
                 <FeaturesSection>
                     <FeatureCard>
                         <FeatureTitle>One-Click Deployments</FeatureTitle>
@@ -201,7 +301,8 @@ const HomePage = () => {
                         </FeatureDesc>
                     </FeatureCard>
 
-                    <FeatureCard>
+                    <FeatureCard comingSoon>
+                        <ComingSoonBadge>Coming Soon</ComingSoonBadge>
                         <FeatureTitle>Auto-scaling & Monitoring</FeatureTitle>
                         <FeatureDesc>
                             Scale dynamically with traffic and monitor real-time
@@ -209,7 +310,8 @@ const HomePage = () => {
                         </FeatureDesc>
                     </FeatureCard>
 
-                    <FeatureCard>
+                    <FeatureCard comingSoon>
+                        <ComingSoonBadge>Coming Soon</ComingSoonBadge>
                         <FeatureTitle>SSL & Domains</FeatureTitle>
                         <FeatureDesc>
                             Free SSL certificates and easy custom domain linking
@@ -218,10 +320,14 @@ const HomePage = () => {
                     </FeatureCard>
                 </FeaturesSection>
 
-                <CTASection>
-                    <CTAHeading>Join the OrbitDeck Revolution 🚀</CTAHeading>
-                    <CTAButton to="/auth/register">Sign Up Now</CTAButton>
-                </CTASection>
+                {!isLoggedIn && (
+                    <CTASection>
+                        <CTAHeading>
+                            Join the OrbitDeck Revolution 🚀
+                        </CTAHeading>
+                        <CTAButton to="/auth/register">Sign Up Now</CTAButton>
+                    </CTASection>
+                )}
 
                 <Footer>
                     © {new Date().getFullYear()} OrbitDeck. All rights reserved.
@@ -231,4 +337,4 @@ const HomePage = () => {
     );
 };
 
-export default HomePage;
+export default Consume(HomePage, [LoginContext]);

@@ -36,10 +36,13 @@ const App = () => {
                         {routes.map((route, index) => (
                             <AuthGuard
                                 key={index}
-                                path={route.path}
-                                component={route.component}
-                                exact={route.exact}
-                                requiresAuth={route.requiresAuth}
+                                {...route}
+                                // path={route.path}
+                                // component={route.component}
+                                // exact={route.exact}
+                                // forceFetch={route.forceFetch}
+                                // isAuthPage={route?.isAuthPage}
+                                // requiresAuth={route.requiresAuth}
                             />
                         ))}
                         <Redirect to="/" />

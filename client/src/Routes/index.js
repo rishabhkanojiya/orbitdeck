@@ -10,12 +10,14 @@ const routes = [
         path: routesObj.auth,
         component: Auth,
         requiresAuth: false,
+        isAuthPage: true,
         exact: false,
     },
     {
         path: routesObj.home,
         component: Home,
-        requiresAuth: true,
+        requiresAuth: false,
+        bgFetch: true,
         exact: true,
     },
     {

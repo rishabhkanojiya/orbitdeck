@@ -10,49 +10,51 @@ import { UserService } from "../../services/user.services";
 const AuthGuard = ({
     ShowPopupData,
     LoginData,
-
     component: Component,
+    isAuthPage,
     requiresAuth,
     ...rest
 }) => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
     const navHeightref = useRef();
+
     const fetchUser = async () => {
         try {
             const userRes = await UserService.getUser();
-
-            const user = await LoginData.setUserObj(userRes.data.user);
+            await LoginData.setUserObj(userRes.data.user);
         } catch (err) {
-            history.push("/auth/login");
-            ShowPopupData.setPopupMessageObj(err.response.data, "error");
+            if (requiresAuth) {
+                history.push("/auth/login");
+                ShowPopupData.setPopupMessageObj(err.response.data, "error");
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        if (requiresAuth && !LoginData?.data?._id) {
-            fetchUser();
-        }
-        setIsLoading(false);
-    }, [requiresAuth, LoginData?.data?._id]);
+        const isLoggedIn = !!LoginData?.data?.username;
 
-    if (isLoading) {
-        return <Loader />;
-    }
+        if (rest?.bgFetch || (requiresAuth && !isLoggedIn)) {
+            fetchUser();
+        } else if (isAuthPage && isLoggedIn) {
+            history.push("/");
+        } else {
+            setIsLoading(false);
+        }
+    }, [requiresAuth, isAuthPage, LoginData?.data?.username]);
+
+    if (isLoading) return <Loader />;
 
     return (
         <Route
             {...rest}
             render={(props) =>
-                LoginData?.data?._id ? (
+                LoginData?.data?.username ? (
                     <>
-                        <Navbar fwdRef={navHeightref} />
-                        <Box
-                            // sx={{ paddingBottom: `${navHeightref?.current?.clientHeight}px` }}
-                            sx={{ paddingBottom: `56px` }}
-                        >
+                        {/* <Navbar fwdRef={navHeightref} /> */}
+                        <Box sx={{ paddingBottom: `56px` }}>
                             <Component {...props} />
                         </Box>
                     </>

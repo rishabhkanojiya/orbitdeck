@@ -19,7 +19,7 @@ const Auth = ({ LoginData }) => {
     let { path } = useRouteMatch();
 
     useEffect(() => {
-        if (LoginData?.data?._id) {
+        if (LoginData?.data?.username) {
             history.push(routesObj.home);
         }
     }, []);
