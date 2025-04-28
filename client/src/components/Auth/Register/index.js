@@ -1,25 +1,66 @@
 import React, { useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { Container, Typography, TextField, Button } from "@mui/material";
-import { styled } from "styled-components";
+import styled from "styled-components";
 import { Consume } from "../../../context/Consumer";
 import { LoginContext, ShowPopupContext } from "../../../context";
 import { useForm } from "react-hook-form";
 import { AuthService } from "../../../services/auth.services";
+import { PrimaryButton } from "../../Button";
 
 const Wrapper = styled.div`
     height: 100%;
-    margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+`;
+
+const FormContainer = styled.div`
+    width: 100%;
+    max-width: 400px;
+    background-color: ${({ theme }) => theme.colors.surface};
+    padding: 32px;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+`;
+
+const Title = styled.h2`
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+`;
+
+const Form = styled.form`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Input = styled.input`
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: ${({ theme }) => theme.colors.background};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: ${({ theme }) => theme.borderRadius.sm};
+    color: ${({ theme }) => theme.colors.textPrimary};
+    font-size: 16px;
+
+    &:focus {
+        outline: none;
+        border-color: ${({ theme }) => theme.colors.primary};
+    }
+`;
+
+const Text = styled.p`
+    margin-top: 16px;
+    font-size: 14px;
+    text-align: center;
+    color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 const StyledLink = styled(Link)`
-    text-decoration: none;
-    color: #ce93d8;
+    color: ${({ theme }) => theme.colors.secondary};
+    text-decoration: underline;
 `;
 
 const Register = ({ ShowPopupData, LoginData }) => {
@@ -44,7 +85,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
             });
     };
 
-    let passwordMatchValidation = {
+    const passwordMatchValidation = {
         required: true,
         validate: {
             passwordMatch: (value) => value === getValues().password,
@@ -63,71 +104,52 @@ const Register = ({ ShowPopupData, LoginData }) => {
 
     return (
         <Wrapper>
-            <Container maxWidth="sm">
-                <Typography variant="h4" align="center" gutterBottom>
-                    Register
-                </Typography>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <TextField
+            <FormContainer>
+                <Title>Register</Title>
+                <Form onSubmit={handleSubmit(onSubmit)}>
+                    <Input
                         id="firstName"
-                        label="First Name"
-                        fullWidth
-                        margin="normal"
+                        placeholder="First Name"
                         required
                         {...register("firstName")}
                     />
-                    <TextField
+                    <Input
                         id="lastName"
-                        label="Last Name"
-                        fullWidth
-                        margin="normal"
+                        placeholder="Last Name"
                         required
                         {...register("lastName")}
                     />
-                    <TextField
+                    <Input
                         id="email"
-                        label="Email"
                         type="email"
-                        fullWidth
-                        margin="normal"
+                        placeholder="Email"
                         required
                         {...register("email")}
                     />
-                    <TextField
+                    <Input
                         id="password"
-                        label="Password"
                         type="password"
-                        fullWidth
-                        margin="normal"
+                        placeholder="Password"
                         required
                         {...register("password")}
                     />
-                    <TextField
+                    <Input
                         id="confirmPassword"
-                        label="Confirm Password"
                         type="password"
-                        fullWidth
-                        margin="normal"
+                        placeholder="Confirm Password"
                         required
                         {...register(
                             "confirmPassword",
                             passwordMatchValidation,
                         )}
                     />
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        type="submit"
-                        fullWidth
-                    >
-                        Register
-                    </Button>
-                    <Typography mt={2} variant="body2" align="center">
-                        Already have an account?{" "}
-                        <StyledLink to="/auth/login">Login</StyledLink>
-                    </Typography>
-                </form>
-            </Container>
+                    <PrimaryButton type="submit">Register</PrimaryButton>
+                </Form>
+                <Text>
+                    Already have an account?{" "}
+                    <StyledLink to="/auth/login">Login</StyledLink>
+                </Text>
+            </FormContainer>
         </Wrapper>
     );
 };

@@ -4,13 +4,17 @@ import App from "./App";
 import { GlobalStyle } from "./GlobalStyle";
 import Toast from "./components/Toast";
 import { LoginProvider, ShowPopupProvider } from "./context/Provider";
+import { ThemeProvider } from "styled-components";
+import { theme } from "./assets/styles/theme";
 
 ReactDOM.render(
     <ShowPopupProvider>
         <LoginProvider>
-            <GlobalStyle />
-            <App />
-            <Toast />
+            <ThemeProvider theme={theme}>
+                <GlobalStyle />
+                <App />
+                <Toast />
+            </ThemeProvider>
         </LoginProvider>
     </ShowPopupProvider>,
     document.getElementById("root"),

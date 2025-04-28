@@ -6,7 +6,6 @@ import { LoginContext } from "../../context";
 
 const Wrapper = styled.div`
     height: 100%;
-    margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;

@@ -1,25 +1,66 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useHistory } from "react-router-dom";
-import { Container, Typography, TextField, Button } from "@mui/material";
-import { styled } from "styled-components";
+import styled from "styled-components";
 import { AuthService } from "../../../services/auth.services";
 import { LoginContext, ShowPopupContext } from "../../../context";
 import { Consume } from "../../../context/Consumer";
 import { useForm } from "react-hook-form";
-import { routesObj } from "../../../common/constants";
+import { PrimaryButton } from "../../Button";
 
 const Wrapper = styled.div`
     height: 100%;
-    margin: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+`;
+
+const FormContainer = styled.div`
+    width: 100%;
+    max-width: 400px;
+    background-color: ${({ theme }) => theme.colors.surface};
+    padding: 32px;
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+`;
+
+const Title = styled.h2`
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+`;
+
+const Form = styled.form`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Input = styled.input`
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background-color: ${({ theme }) => theme.colors.background};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: ${({ theme }) => theme.borderRadius.sm};
+    color: ${({ theme }) => theme.colors.textPrimary};
+    font-size: 16px;
+
+    &:focus {
+        outline: none;
+        border-color: ${({ theme }) => theme.colors.primary};
+    }
+`;
+
+const Text = styled.p`
+    margin-top: 16px;
+    font-size: 14px;
+    text-align: center;
+    color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 const StyledLink = styled(Link)`
-    color: #ce93d8;
+    color: ${({ theme }) => theme.colors.secondary};
+    text-decoration: underline;
 `;
 
 const Login = ({ ShowPopupData, LoginData }) => {
@@ -30,9 +71,7 @@ const Login = ({ ShowPopupData, LoginData }) => {
         try {
             const result = await AuthService.login(data);
             LoginData.setUserObj(result.data.user);
-            console.log(result.data.user);
-
-            history.push(routesObj.home);
+            history.push("/");
         } catch (err) {
             ShowPopupData.setPopupMessageObj(err.response.data, "error");
         }
@@ -40,49 +79,31 @@ const Login = ({ ShowPopupData, LoginData }) => {
 
     return (
         <Wrapper>
-            <Container maxWidth="sm">
-                <Typography variant="h4" align="center" gutterBottom>
-                    Login
-                </Typography>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <TextField
+            <FormContainer>
+                <Title>Login</Title>
+                <Form onSubmit={handleSubmit(onSubmit)}>
+                    <Input
                         id="username"
-                        label="Username"
-                        fullWidth
-                        margin="normal"
-                        value="rk1"
+                        placeholder="Username"
                         required
+                        value={"rk1"}
                         {...register("username")}
                     />
-                    <TextField
+                    <Input
                         id="password"
-                        label="Password"
                         type="password"
-                        fullWidth
-                        margin="normal"
-                        value="Qwe@123456"
+                        placeholder="Password"
                         required
+                        value={"Qwe@123456"}
                         {...register("password")}
                     />
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        type="submit"
-                        fullWidth
-                    >
-                        Login
-                    </Button>
-                    <Typography mt={2} variant="body2" align="center">
-                        Don't have an account?{" "}
-                        <StyledLink to="/auth/register">Register</StyledLink>
-                    </Typography>
-                    <Typography variant="body2" align="center">
-                        <StyledLink to="/auth/forgot-password">
-                            Forgot password?
-                        </StyledLink>
-                    </Typography>
-                </form>
-            </Container>
+                    <PrimaryButton type="submit">Login</PrimaryButton>
+                </Form>
+                <Text>
+                    Don't have an account?{" "}
+                    <StyledLink to="/auth/register">Register</StyledLink>
+                </Text>
+            </FormContainer>
         </Wrapper>
     );
 };
