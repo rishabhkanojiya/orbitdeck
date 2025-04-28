@@ -25,11 +25,11 @@ POST http://{{host}}/users/login
 Content-Type: {{contentType}}
 
 {
-    "username": "rk1",
-    "password": "Qwe@1234567"
+    "username": "rk2",
+    "password": "Qwe@123456"
 }
 
-@login_token = {{login.response.body.access_token}}
+# @login_token = {{login.response.body.access_token}}
 
 
 ###
@@ -39,4 +39,13 @@ Content-Type: {{contentType}}
 {
     "refresh_token": "v2.local.xEFCGxBLJDXcJsWvOSO1uBNURoHz218dhRBXIZZHuzMcEEtBw5a1H1vF7KuxuEfh3YU352p3h_Ka-70uz-1Ouf_p70liNHgC9mPX1aJw7VuRrD10WN59XdBQfpz4uSGx86MJJ9LHzVNmuagl74wLLPTRtbASEweiy-EBR4Qdrk3j9L0sEynOqrOHQb4usqvGLwUDwe49VevMpLsLAv1TqrYjqt9WrQZVPJbOb05y9XyZbemadoBI9_tUfXyM2Mh3167IFX4J-w.bnVsbA"
 }
+
+
+###
+# @name me
+// @no-cookie-jar
+GET http://{{host}}/me
+Content-Type: {{contentType}}
+# Authorization: Bearer {{login_token}}
+Cookie: access_token=v2.local.DZZotPJB2crWMynGChGdgcWVt_4gINMfM2hHpywQYpEvec3DZ8GfcTfVXgzlcpQWcZHn27g_7XuzTGasTA6kWMiy3rL_6yD_G589TfkJYtpBXL-A6xeX0gbutUq9bJ48Z7MDLOcQ5S3YiX-0UdrRXveSjt6pq7tR5xhLuz4pMULzV5UfWpCRDd3-Zf9w-xYgCooFmMDmtz7ZwOg4WGBduhJtqZpPcOD27kr3C7_YmQ5jE6PM1lAwQzLmb9-e9yJyXvVUOeZAKw.bnVsbA; Path=/; Max-Age=900; HttpOnly,access_token_expires_at=2025-04-27T21%3A20%3A17-04%3A00; Path=/; Max-Age=900; HttpOnly
 

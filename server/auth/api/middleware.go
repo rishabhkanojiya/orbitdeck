@@ -16,8 +16,7 @@ const (
 	AuthorizationPayloadKey = "authorization_payload"
 )
 
-// AuthMiddleware creates a gin middleware for authorization
-func AuthMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
+func AuthMiddlewareToken(tokenMaker token.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorizationHeader := ctx.GetHeader(AuthorizationHeaderKey)
 
@@ -42,6 +41,26 @@ func AuthMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 		}
 
 		accessToken := fields[1]
+		payload, err := tokenMaker.VerifyToken(accessToken)
+		if err != nil {
+			ctx.AbortWithStatusJSON(errorResponse(http.StatusUnauthorized, err))
+			return
+		}
+
+		ctx.Set(AuthorizationPayloadKey, payload)
+		ctx.Next()
+	}
+}
+
+func AuthMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+
+		accessToken, err := ctx.Cookie("access_token")
+		if err != nil {
+			err := errors.New("access token cookie is not provided")
+			ctx.AbortWithStatusJSON(errorResponse(http.StatusUnauthorized, err))
+			return
+		}
 		payload, err := tokenMaker.VerifyToken(accessToken)
 		if err != nil {
 			ctx.AbortWithStatusJSON(errorResponse(http.StatusUnauthorized, err))

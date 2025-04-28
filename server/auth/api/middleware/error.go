@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"github.com/rs/zerolog/log"
-
 	"github.com/gin-gonic/gin"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/util"
 )
@@ -12,7 +10,6 @@ func ErrorHandler() gin.HandlerFunc {
 		c.Next()
 
 		errors := c.Errors
-		log.Debug().Interface("err", len(errors)).Msg("cannot start server")
 
 		if len(errors) > 0 {
 			err := errors[0].Err

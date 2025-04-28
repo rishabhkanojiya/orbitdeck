@@ -64,7 +64,7 @@ func setDefaults() {
 	viper.SetDefault("SERVER_PORT", 9069)
 	viper.SetDefault("MODE", "development")
 	viper.SetDefault("WORKER_TYPE", "api")
-	viper.SetDefault("ACCESS_TOKEN_DURATION", time.Hour*24)
+	viper.SetDefault("ACCESS_TOKEN_DURATION", time.Minute*15)
 	viper.SetDefault("REFRESH_TOKEN_DURATION", time.Hour*24*7)
 }
 

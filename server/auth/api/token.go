@@ -9,23 +9,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type renewAccessTokenRequest struct {
-	RefreshToken string `json:"refresh_token" binding:"required"`
-}
-
-type renewAccessTokenResponse struct {
-	AccessToken          string    `json:"access_token"`
-	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
-}
+// type renewAccessTokenResponse struct {
+// 	AccessToken          string    `json:"access_token"`
+// 	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
+// }
 
 func (server *Server) renewAccessToken(ctx *gin.Context) {
-	var req renewAccessTokenRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(errorResponse(http.StatusBadRequest, err))
+
+	refreshToken, err := ctx.Cookie("refresh_token")
+	if err != nil {
+		err := fmt.Errorf("refresh token cookie is missing")
+		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
 	}
 
-	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
+	refreshPayload, err := server.tokenMaker.VerifyToken(refreshToken)
 	if err != nil {
 		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
 		return
@@ -42,26 +40,22 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 	}
 
 	if session.IsBlocked {
-		err := fmt.Errorf("blocked session")
-		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, fmt.Errorf("blocked session")))
 		return
 	}
 
 	if session.Username != refreshPayload.Username {
-		err := fmt.Errorf("incorrect session user")
-		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, fmt.Errorf("incorrect session user")))
 		return
 	}
 
-	if session.RefreshToken != req.RefreshToken {
-		err := fmt.Errorf("mismatched session token")
-		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
+	if session.RefreshToken != refreshToken {
+		ctx.JSON(errorResponse(http.StatusUnauthorized, fmt.Errorf("mismatched session token")))
 		return
 	}
 
 	if time.Now().After(session.ExpiresAt) {
-		err := fmt.Errorf("expired session")
-		ctx.JSON(errorResponse(http.StatusUnauthorized, err))
+		ctx.JSON(errorResponse(http.StatusUnauthorized, fmt.Errorf("expired session")))
 		return
 	}
 
@@ -74,9 +68,32 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 		return
 	}
 
-	rsp := renewAccessTokenResponse{
-		AccessToken:          accessToken,
-		AccessTokenExpiresAt: accessPayload.ExpiredAt,
-	}
-	ctx.JSON(http.StatusOK, rsp)
+	server.setAccessTokenCookie(ctx, accessToken, accessPayload.ExpiredAt)
+	ctx.JSON(http.StatusOK, "Success")
+
+	// rsp := renewAccessTokenResponse{
+	// 	AccessToken:          accessToken,
+	// 	AccessTokenExpiresAt: accessPayload.ExpiredAt,
+	// }
+	// ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) setAccessTokenCookie(ctx *gin.Context, accessToken string, expiresAt time.Time) {
+	const cookiePath = "/"
+	const httpOnly = true
+	const secure = false
+
+	ctx.SetCookie(
+		"access_token",
+		accessToken,
+		int(time.Until(expiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
+
+	ctx.SetCookie(
+		"access_token_expires_at",
+		expiresAt.Format(time.RFC3339),
+		int(time.Until(expiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
 }

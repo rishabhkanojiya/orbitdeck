@@ -8,6 +8,7 @@ export const URLS = {
     loginUser: `${environment.AUTH_API_URL}/users/login`,
     logoutUser: `${environment.AUTH_API_URL}/user/logout`,
     resetPassword: `${environment.AUTH_API_URL}/users/renew_access`,
+    me: `${environment.AUTH_API_URL}/me`,
 
     groups: `${environment.API_URL}/v1.0${groupUrl}`,
     group: `${environment.API_URL}/v1.0${groupUrl}/:groupId`,

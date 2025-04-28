@@ -77,11 +77,12 @@ func (server *Server) setupRouter() {
 		AllowCredentials: true,
 	}))
 
-	// router.Use(middleware.ErrorHandler())
-	router.Use(LogCORSRejections())
 	router.POST("/users", server.createUser)
 	router.POST("/users/login", server.loginUser)
 	router.POST("/tokens/renew_access", server.renewAccessToken)
+
+	authRoutes := router.Group("/").Use(AuthMiddleware(server.tokenMaker))
+	authRoutes.GET("/me", server.GetUser)
 
 	server.router = router
 }

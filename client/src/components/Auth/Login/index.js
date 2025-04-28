@@ -29,8 +29,8 @@ const Login = ({ ShowPopupData, LoginData }) => {
     const onSubmit = async (data) => {
         try {
             const result = await AuthService.login(data);
-
             LoginData.setUserObj(result.data.user);
+            console.log(result.data.user);
 
             history.push(routesObj.home);
         } catch (err) {

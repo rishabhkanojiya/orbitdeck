@@ -6,6 +6,7 @@ import (
 	"time"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/auth/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/util"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/worker"
 
@@ -38,6 +39,58 @@ func newUserResponse(user db.User) userResponse {
 		PasswordChangedAt: user.PasswordChangedAt,
 		CreatedAt:         user.CreatedAt,
 	}
+}
+
+// Helper function to set token-related cookies
+func (server *Server) setTokenCookies(
+	ctx *gin.Context,
+	accessToken string,
+	accessTokenExpiresAt time.Time,
+	refreshToken string,
+	refreshTokenExpiresAt time.Time,
+	sessionID uuid.UUID,
+) {
+	const cookiePath = "/"
+	const httpOnly = true
+	const secure = false // set to true if you are using HTTPS
+
+	// Set Access Token Cookie
+	ctx.SetCookie(
+		"access_token",
+		accessToken,
+		int(time.Until(accessTokenExpiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
+
+	ctx.SetCookie(
+		"access_token_expires_at",
+		accessTokenExpiresAt.Format(time.RFC3339),
+		int(time.Until(accessTokenExpiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
+
+	// Set Refresh Token Cookie
+	ctx.SetCookie(
+		"refresh_token",
+		refreshToken,
+		int(time.Until(refreshTokenExpiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
+
+	ctx.SetCookie(
+		"refresh_token_expires_at",
+		refreshTokenExpiresAt.Format(time.RFC3339),
+		int(time.Until(refreshTokenExpiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
+
+	// Set Session ID Cookie
+	ctx.SetCookie(
+		"session_id",
+		sessionID.String(),
+		int(time.Until(refreshTokenExpiresAt).Seconds()),
+		cookiePath, "", secure, httpOnly,
+	)
 }
 
 func (server *Server) createUser(ctx *gin.Context) {
@@ -96,12 +149,15 @@ type loginUserRequest struct {
 }
 
 type loginUserResponse struct {
-	SessionID             uuid.UUID    `json:"session_id"`
-	AccessToken           string       `json:"access_token"`
-	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
-	RefreshToken          string       `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
-	User                  userResponse `json:"user"`
+	// SessionID             uuid.UUID    `json:"session_id"`
+	// AccessToken           string       `json:"access_token"`
+	// AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
+	// RefreshToken          string       `json:"refresh_token"`
+	// RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
+	User userResponse `json:"user"`
+}
+type getUserResponse struct {
+	User userResponse `json:"user"`
 }
 
 func (server *Server) loginUser(ctx *gin.Context) {
@@ -131,6 +187,7 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		user.Username,
 		server.config.ACCESS_TOKEN_DURATION,
 	)
+
 	if err != nil {
 		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
@@ -159,13 +216,35 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
+	server.setTokenCookies(ctx, accessToken, accessPayload.ExpiredAt, refreshToken, refreshPayload.ExpiredAt, session.ID)
+
 	rsp := loginUserResponse{
-		SessionID:             session.ID,
-		AccessToken:           accessToken,
-		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
-		RefreshToken:          refreshToken,
-		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:                  newUserResponse(user),
+		// SessionID:             session.ID,
+		// AccessToken:           accessToken,
+		// AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		// RefreshToken:          refreshToken,
+		// RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		User: newUserResponse(user),
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) GetUser(ctx *gin.Context) {
+
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+	user, err := server.store.GetUser(ctx, authPayload.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(errorResponse(http.StatusNotFound, err))
+			return
+		}
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
+		return
+	}
+
+	rsp := getUserResponse{
+		User: newUserResponse(user),
 	}
 	ctx.JSON(http.StatusOK, rsp)
 }
