@@ -1,6 +1,7 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import { tech } from "../common/constants";
+import { getSkillIcons } from "../common/utils";
 
 export const generateRandomPos = () => {
     const top = `${Math.floor(Math.random() * 90)}vh`;
@@ -82,7 +83,7 @@ const FloatingIcons = () => {
                 return (
                     <FloatingAsset
                         key={idx}
-                        src={`https://skillicons.dev/icons?i=${skill}`}
+                        src={getSkillIcons(skill)}
                         style={asset.style}
                         $animation={asset.animation}
                         alt={skill}

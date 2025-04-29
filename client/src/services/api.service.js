@@ -44,27 +44,8 @@ ApiService.axios = (options) => {
     return axios(options);
 };
 
-axios.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    //   (error) => {
-    //     if (
-    //       401 === (error.response && error.response.status)
-    //       // || 403 === (error.response && error.response.status)
-    //     ) {
-    //       if (
-    //         !error.response.config.url.includes("authentication") &&
-    //         !error.response.config.url.includes("session")
-    //       ) {
-    //         window.location.pathname = "/auth/login";
-    //         // setTimeout(() => {
-    //         //   window.location.pathname = "/auth/login";
-    //         // }, 500);
-    //       }
-    //     }
-    //     return Promise.reject(error);
-    //   }
-);
+axios.interceptors.response.use((response) => {
+    return response;
+});
 
 export default ApiService;

@@ -27,3 +27,7 @@ export const stringAvatar = (name) => {
         }`.toUpperCase(),
     };
 };
+
+export const getSkillIcons = (skill) => {
+    return `https://skillicons.dev/icons?i=${skill}`;
+};

@@ -1,7 +1,6 @@
 import environment from "../../environment";
 
-const groupUrl = "/groups";
-const memberUrl = "/members";
+const deploymentUrl = "/deployment";
 
 export const URLS = {
     registerUser: `${environment.AUTH_API_URL}/users`,
@@ -10,13 +9,7 @@ export const URLS = {
     resetPassword: `${environment.AUTH_API_URL}/users/renew_access`,
     me: `${environment.AUTH_API_URL}/me`,
 
-    groups: `${environment.API_URL}/v1.0${groupUrl}`,
-    group: `${environment.API_URL}/v1.0${groupUrl}/:groupId`,
-    groupMember: `${environment.API_URL}/v1.0${groupUrl}/:groupId/add/:memberId`,
-    groupMemberRemove: `${environment.API_URL}/v1.0${groupUrl}/:groupId/remove/:memberId`,
-    groupMemberMultiple: `${environment.API_URL}/v1.0${groupUrl}/:groupId/multiple/add`,
-    sendMail: `${environment.API_URL}/v1.0${groupUrl}/:groupId/sendMail`,
-
-    members: `${environment.API_URL}/v1.0${memberUrl}`,
-    member: `${environment.API_URL}/v1.0${memberUrl}/:memberId`,
+    deployments: `${environment.API_URL}/${deploymentUrl}`,
+    deployment: `${environment.API_URL}/${deploymentUrl}/:deploymentId`,
+    deploymentAdd: `${environment.API_URL}/${deploymentUrl}/add`,
 };

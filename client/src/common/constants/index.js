@@ -1,10 +1,10 @@
+import { getSkillIcons } from "../utils";
+
 export const routesObj = {
     auth: "/auth",
     home: "/",
-    groupId: "/group/:groupId",
-    groupAdd: "/groups/add",
-    members: "/members",
-    membersAdd: "/members/add",
+    deploymentId: "/deployment/:id",
+    deploymentAdd: "/deployment/add",
     me: "/me",
 };
 
@@ -38,3 +38,13 @@ export const tech = [
     "supabase",
     "jest",
 ];
+
+export const skillIconUrls = {
+    postgresql: getSkillIcons("postgres"),
+    mongodb: getSkillIcons("mongodb"),
+    redis: getSkillIcons("redis"),
+    mysql: getSkillIcons("mysql"),
+    grafana: getSkillIcons("grafana"),
+    sentry: getSkillIcons("sentry"),
+    rabbitmq: getSkillIcons("rabbitmq"),
+};
