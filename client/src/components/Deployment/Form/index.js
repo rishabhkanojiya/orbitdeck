@@ -102,23 +102,23 @@ const SubmitButton = styled.button`
 const repositories = [
     {
         label: "PostgreSQL",
-        value: "postgres:latest",
+        value: "postgres",
         icon: skillIconUrls.postgresql,
     },
-    { label: "MongoDB", value: "mongodb:latest", icon: skillIconUrls.mongodb },
-    { label: "Redis", value: "redis:latest", icon: skillIconUrls.redis },
-    { label: "MySQL", value: "mysql:latest", icon: skillIconUrls.mysql },
-    { label: "Grafana", value: "grafana:latest", icon: skillIconUrls.grafana },
-    { label: "Sentry", value: "sentry:latest", icon: skillIconUrls.sentry },
+    { label: "MongoDB", value: "mongodb", icon: skillIconUrls.mongodb },
+    { label: "Redis", value: "redis", icon: skillIconUrls.redis },
+    { label: "MySQL", value: "mysql", icon: skillIconUrls.mysql },
+    { label: "Grafana", value: "grafana", icon: skillIconUrls.grafana },
+    { label: "Sentry", value: "sentry", icon: skillIconUrls.sentry },
     {
         label: "RabbitMQ",
-        value: "rabbitmq:latest",
+        value: "rabbitmq",
         icon: skillIconUrls.rabbitmq,
     },
     { label: "Custom", value: "custom", icon: "" },
 ];
 
-const DeployPage = () => {
+const DeploymentForm = () => {
     const { control, register, handleSubmit, setValue } = useForm({
         defaultValues: {
             name: "",
@@ -222,4 +222,4 @@ const DeployPage = () => {
     );
 };
 
-export default DeployPage;
+export default DeploymentForm;

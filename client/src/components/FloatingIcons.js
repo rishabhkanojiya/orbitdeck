@@ -82,7 +82,8 @@ const FloatingIcons = () => {
                 const asset = generateRandomPos();
                 return (
                     <FloatingAsset
-                        key={idx}
+                        // key={idx}
+                        key={JSON.stringify(asset.animation)}
                         src={getSkillIcons(skill)}
                         style={asset.style}
                         $animation={asset.animation}
