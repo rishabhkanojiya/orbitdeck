@@ -12,6 +12,7 @@ import (
 	"github.com/hibiken/asynq"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
+	"github.com/rs/zerolog/log"
 )
 
 type CreateDeploymentRequest struct {
@@ -88,16 +89,15 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		params.Ingress = generateIngressFromComponents(req.Ingress.Host, req.Components, req.Ingress)
 	}
 
-	AfterCreate := func(id int64) error {
-		taskPayload := &worker.PayloadGenerateHelm{
-			Id: id,
+	AfterCreate := func(id int64) (string, error) {
+		taskPayload := &worker.PayloadGenerateHelm{Id: id}
+		opts := []asynq.Option{asynq.MaxRetry(1), asynq.ProcessIn(1 * time.Second), asynq.Queue(worker.QueueCore)}
+		info, err := server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
+		if err != nil {
+			return "", err
 		}
-		opts := []asynq.Option{
-			asynq.MaxRetry(0),
-			asynq.ProcessIn(1 * time.Second),
-			asynq.Queue(worker.QueueCore),
-		}
-		return server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
+		params.TaskId = info.ID
+		return info.ID, nil
 	}
 
 	for i, comp := range req.Components {
@@ -266,5 +266,35 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"deployment": deployment,
 		"Message":    fmt.Sprintf("Helm Release %s will be removed soon", deployment.HelmRelease.String),
+	})
+}
+
+func (server *Server) GetDeploymentStatus(ctx *gin.Context) {
+	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(errorResponse(http.StatusBadRequest, err))
+		return
+	}
+
+	deployment, err := server.store.GetDeployment(ctx, id)
+	if err != nil {
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
+		return
+	}
+
+	if !deployment.TaskID.Valid {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "No task associated with deployment"})
+		return
+	}
+
+	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS}) // adjust config
+	info, err := inspector.GetTaskInfo(worker.QueueCore, deployment.TaskID.String)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	log.Debug().Interface("Info", info).Msg("Task Info")
+	ctx.JSON(http.StatusOK, gin.H{
+		"state": info.State, // pending, active, succeeded, failed
 	})
 }

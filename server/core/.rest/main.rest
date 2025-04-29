@@ -32,16 +32,21 @@ Content-Type: {{contentType}}
 }
 
 ###
-GET http://{{host}}/deployment?pageNo=5
+GET http://{{host}}/deployment?pageNo=1
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/1
+GET http://{{host}}/deployment/4
 Content-Type: {{contentType}}
 
+# Delete
 ###
 POST http://{{host}}/deployment/1
 Content-Type: {{contentType}}
+
+###
+GET http://{{host}}/deployment/4/status
+
 
 ###
 POST http://{{host}}/deployment/add

@@ -11,6 +11,7 @@ type DeploymentParams struct {
 	Name        string
 	Environment string
 	HelmRelease string
+	TaskId      string
 	Components  []ComponentParams
 	Ingress     []IngressParams // Add ingress support
 	CreatedAt   sql.NullTime
@@ -50,7 +51,7 @@ type ResourcesParams struct {
 	}
 }
 
-func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) error) (Deployment, error) {
+func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) (string, error)) (Deployment, error) {
 	var deployment Deployment
 
 	err := store.execTx(ctx, func(q *Queries) error {
@@ -123,9 +124,23 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 		}
 
 		deployment = d
+		var taskId string
+		taskId, err = AfterCreate(d.ID)
+		if err != nil {
+			return err
+		}
 
-		return AfterCreate(deployment.ID)
+		if taskId != "" {
+			err = q.UpdateDeploymentTaskID(ctx, UpdateDeploymentTaskIDParams{
+				ID:     d.ID,
+				TaskID: sql.NullString{String: taskId, Valid: true},
+			})
+			if err != nil {
+				return fmt.Errorf("failed to update deployment with task ID: %w", err)
+			}
+		}
 
+		return nil
 	})
 
 	return deployment, err

@@ -8,6 +8,8 @@ import { skillIconUrls } from "../../../common/constants";
 import FloatingIcons from "../../FloatingIcons";
 
 import { useTestDeployData } from "../../../hooks/useTestDeployData";
+import { Consume } from "../../../context/Consumer";
+import { ShowPopupContext } from "../../../context";
 
 const PageWrapper = styled.div`
     width: 100%;
@@ -139,7 +141,7 @@ const repositories = [
     { label: "Custom", value: "custom", icon: "" },
 ];
 
-const DeploymentForm = () => {
+const DeploymentForm = ({ ShowPopupData }) => {
     const { control, register, handleSubmit, setValue } = useForm({
         defaultValues: {
             name: "",
@@ -165,11 +167,18 @@ const DeploymentForm = () => {
     const onSubmit = async (data) => {
         try {
             await DeploymentService.createDeployment(data);
-            alert("Deployment created successfully!");
+            ShowPopupData.setPopupMessageObj(
+                { message: "Deployment currently in progress" },
+                "success",
+            );
+
             history.push("/dashboard");
         } catch (error) {
             console.error(error.response?.data || error.message);
-            alert(error.response?.data?.error || "Deployment failed");
+            ShowPopupData.setPopupMessageObj(
+                error.response?.data?.error || "Deployment failed",
+                "error",
+            );
         }
     };
 
@@ -252,4 +261,4 @@ const DeploymentForm = () => {
     );
 };
 
-export default DeploymentForm;
+export default Consume(DeploymentForm, [ShowPopupContext]);

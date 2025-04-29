@@ -23,6 +23,7 @@ type Querier interface {
 	GetIngressByDeployment(ctx context.Context, deploymentID int64) ([]Ingress, error)
 	GetIngressByHost(ctx context.Context, host string) (Ingress, error)
 	ListDeploymentsPaginated(ctx context.Context, arg ListDeploymentsPaginatedParams) ([]Deployment, error)
+	UpdateDeploymentTaskID(ctx context.Context, arg UpdateDeploymentTaskIDParams) error
 }
 
 var _ Querier = (*Queries)(nil)

@@ -91,7 +91,7 @@ const Toast = ({ ShowPopupData }) => {
         if (showPopup) {
             const timer = setTimeout(() => {
                 setShowPopup(false);
-            }, 500000);
+            }, 5000);
 
             return () => clearTimeout(timer);
         }

@@ -55,7 +55,7 @@ func (q *Queries) CreateComponent(ctx context.Context, arg CreateComponentParams
 const createDeployment = `-- name: CreateDeployment :one
 INSERT INTO deployments (name, environment, helm_release)
 VALUES ($1, $2, $3)
-RETURNING id, name, environment, helm_release, created_at
+RETURNING id, name, environment, helm_release, task_id, created_at
 `
 
 type CreateDeploymentParams struct {
@@ -72,6 +72,7 @@ func (q *Queries) CreateDeployment(ctx context.Context, arg CreateDeploymentPara
 		&i.Name,
 		&i.Environment,
 		&i.HelmRelease,
+		&i.TaskID,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -192,7 +193,7 @@ func (q *Queries) GetComponentEnvVars(ctx context.Context, componentID int64) ([
 }
 
 const getDeployment = `-- name: GetDeployment :one
-SELECT id, name, environment, helm_release, created_at FROM deployments WHERE id = $1
+SELECT id, name, environment, helm_release, task_id, created_at FROM deployments WHERE id = $1
 `
 
 func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, error) {
@@ -203,6 +204,7 @@ func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, erro
 		&i.Name,
 		&i.Environment,
 		&i.HelmRelease,
+		&i.TaskID,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -267,7 +269,7 @@ func (q *Queries) GetDeploymentComponents(ctx context.Context, deploymentID int6
 }
 
 const listDeploymentsPaginated = `-- name: ListDeploymentsPaginated :many
-SELECT id, name, environment, helm_release, created_at FROM deployments
+SELECT id, name, environment, helm_release, task_id, created_at FROM deployments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -291,6 +293,7 @@ func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeployme
 			&i.Name,
 			&i.Environment,
 			&i.HelmRelease,
+			&i.TaskID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -304,4 +307,20 @@ func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeployme
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateDeploymentTaskID = `-- name: UpdateDeploymentTaskID :exec
+UPDATE deployments
+SET task_id = $2
+WHERE id = $1
+`
+
+type UpdateDeploymentTaskIDParams struct {
+	ID     int64          `json:"id"`
+	TaskID sql.NullString `json:"task_id"`
+}
+
+func (q *Queries) UpdateDeploymentTaskID(ctx context.Context, arg UpdateDeploymentTaskIDParams) error {
+	_, err := q.db.ExecContext(ctx, updateDeploymentTaskID, arg.ID, arg.TaskID)
+	return err
 }

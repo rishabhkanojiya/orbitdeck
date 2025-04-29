@@ -11,7 +11,7 @@ type TaskDistributor interface {
 		ctx context.Context,
 		payload *PayloadGenerateHelm,
 		opts ...asynq.Option,
-	) error
+	) (*asynq.TaskInfo, error)
 	DistributeTaskUninstallHelm(
 		ctx context.Context,
 		payload *PayloadUninstallHelm,

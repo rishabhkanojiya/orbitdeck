@@ -67,6 +67,7 @@ type Deployment struct {
 	Name        string         `json:"name"`
 	Environment Environment    `json:"environment"`
 	HelmRelease sql.NullString `json:"helm_release"`
+	TaskID      sql.NullString `json:"task_id"`
 	CreatedAt   time.Time      `json:"created_at"`
 }
 
