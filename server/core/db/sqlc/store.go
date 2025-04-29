@@ -10,6 +10,7 @@ type Store interface {
 	Querier
 	CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) error) (Deployment, error)
 	GetDeploymentObject(ctx context.Context, id int64) (DeploymentParams, error)
+	GetPaginatedDeploymentObjects(ctx context.Context, limit, offset int32) (PaginatedDeploymentsResult, error)
 }
 
 // Store provides all functions to execute db queries and transaction

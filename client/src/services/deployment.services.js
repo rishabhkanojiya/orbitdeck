@@ -8,8 +8,8 @@ export const DeploymentService = {
         return ApiService.post(URLS.deploymentAdd, axiosOptions);
     },
 
-    getMyDeployments() {
-        const axiosOptions = {};
+    getMyDeployments(formData) {
+        const axiosOptions = { params: formData };
 
         return ApiService.get(URLS.deployments, axiosOptions);
     },

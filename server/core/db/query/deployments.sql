@@ -38,3 +38,11 @@ WHERE c.deployment_id = $1;
 
 -- name: GetComponentEnvVars :many
 SELECT key, value FROM env_vars WHERE component_id = $1;
+
+-- name: ListDeploymentsPaginated :many
+SELECT * FROM deployments
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
+
+-- name: CountDeployments :one
+SELECT COUNT(*) FROM deployments;

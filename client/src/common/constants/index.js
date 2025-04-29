@@ -40,7 +40,7 @@ export const tech = [
 ];
 
 export const skillIconUrls = {
-    postgresql: getSkillIcons("postgres"),
+    postgres: getSkillIcons("postgres"),
     mongodb: getSkillIcons("mongodb"),
     redis: getSkillIcons("redis"),
     mysql: getSkillIcons("mysql"),

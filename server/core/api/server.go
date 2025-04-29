@@ -6,6 +6,7 @@ import (
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/util"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 
 	"github.com/gin-contrib/cors"
@@ -49,7 +50,7 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // Change this to specific origins if needed
+		AllowOrigins:     []string{"http://orbitdeck.app", "http://orbitdeck.app", "http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
@@ -57,6 +58,7 @@ func (server *Server) setupRouter() {
 
 	// deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
 	deploymentRoutes := router.Group("/deployment")
+	deploymentRoutes.GET("", server.GetDeployments)
 	deploymentRoutes.POST("/add", server.CreateDeployment)
 	deploymentRoutes.GET("/:id", server.GetDeployment)
 	deploymentRoutes.POST("/:id", server.UninstallDeployment)
@@ -68,6 +70,13 @@ func (server *Server) Start(address string) error {
 	return server.router.Run(address)
 }
 
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
+func errorResponse(status int, err error) (int, util.ErrorResponse) {
+	var customErr = &util.Error{
+		Status:  status,
+		Message: err.Error(),
+	}
+
+	errRet := util.FormatErrorResponse(customErr)
+
+	return status, errRet
 }

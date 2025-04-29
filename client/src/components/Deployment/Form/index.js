@@ -7,6 +7,8 @@ import { DeploymentService } from "../../../services/deployment.services";
 import { skillIconUrls } from "../../../common/constants";
 import FloatingIcons from "../../FloatingIcons";
 
+import { useTestDeployData } from "../../../hooks/useTestDeployData";
+
 const PageWrapper = styled.div`
     width: 100%;
     min-height: 100vh;
@@ -99,11 +101,30 @@ const SubmitButton = styled.button`
     }
 `;
 
+const TestButton = styled.button`
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.textPrimary};
+    margin-left: 10px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    cursor: pointer;
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:hover {
+        background: ${({ theme }) => theme.colors.primaryHover};
+        box-shadow: 0 0 10px ${({ theme }) => theme.colors.primaryHover};
+    }
+`;
+
 const repositories = [
     {
         label: "PostgreSQL",
         value: "postgres",
-        icon: skillIconUrls.postgresql,
+        icon: skillIconUrls.postgres,
     },
     { label: "MongoDB", value: "mongodb", icon: skillIconUrls.mongodb },
     { label: "Redis", value: "redis", icon: skillIconUrls.redis },
@@ -151,6 +172,9 @@ const DeploymentForm = () => {
             alert(error.response?.data?.error || "Deployment failed");
         }
     };
+
+    const { fillSimpleDeploy, fillMultiDeploy, fillMultiIngressDeploy } =
+        useTestDeployData(setValue, append, setSelectedRepo);
 
     return (
         <>
@@ -216,6 +240,12 @@ const DeploymentForm = () => {
 
                     <br />
                     <SubmitButton type="submit">🚀 Deploy Now</SubmitButton>
+                    <TestButton type="button" onClick={fillSimpleDeploy}>
+                        ⚡ Fill Dummy Data
+                    </TestButton>
+                    <TestButton onClick={fillMultiDeploy}>
+                        ⚡ Fill Multi Deploy
+                    </TestButton>
                 </FormWrapper>
             </PageWrapper>
         </>

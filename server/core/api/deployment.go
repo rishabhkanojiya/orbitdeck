@@ -62,7 +62,7 @@ type EnvVarRequest struct {
 func (server *Server) CreateDeployment(ctx *gin.Context) {
 	var req CreateDeploymentRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusBadRequest, err))
 		return
 	}
 
@@ -138,7 +138,7 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 
 	deployment, err := server.store.CreateDeploymentTx(ctx, params, AfterCreate)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -184,7 +184,7 @@ func generateIngressFromComponents(host string, components []ComponentRequest, i
 func (server *Server) GetDeployment(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+		c.JSON(errorResponse(http.StatusBadRequest, err))
 		return
 	}
 
@@ -201,10 +201,45 @@ func (server *Server) GetDeployment(c *gin.Context) {
 	c.JSON(http.StatusOK, deployment)
 }
 
+func (server *Server) GetDeployments(c *gin.Context) {
+	pageNoStr := c.DefaultQuery("pageNo", "1")
+	pageSizeStr := c.DefaultQuery("pageSize", "10")
+
+	pageNo, err := strconv.Atoi(pageNoStr)
+	if err != nil || pageNo < 1 {
+		pageNo = 1
+	}
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil || pageSize < 1 {
+		pageSize = 10
+	}
+
+	offset := (pageNo - 1) * pageSize
+
+	result, err := server.store.GetPaginatedDeploymentObjects(c.Request.Context(), int32(pageSize), int32(offset))
+	if err != nil {
+		c.JSON(errorResponse(http.StatusInternalServerError, err))
+		return
+	}
+
+	page := gin.H{
+		"type":      "number",
+		"size":      len(result.Results),
+		"current":   pageNo,
+		"hasNext":   int64(pageNo*pageSize) < result.Total,
+		"itemTotal": result.Total,
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"items": result.Results,
+		"page":  page,
+	})
+}
+
 func (server *Server) UninstallDeployment(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, errorResponse(err))
+		c.JSON(errorResponse(http.StatusBadRequest, err))
 		return
 	}
 

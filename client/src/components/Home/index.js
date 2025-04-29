@@ -6,7 +6,8 @@ import { Consume } from "../../context/Consumer";
 import { LoginContext } from "../../context";
 import { routesObj } from "../../common/constants";
 import { BackgroundBlob, BackgroundOrbits } from "../UiComponents";
-// import { DeploymentService } from "../../services/deployment.services";
+import { DeploymentService } from "../../services/deployment.services";
+import Dashboard from "./Dashboard";
 
 const PageWrapper = styled.div`
     width: 100%;
@@ -127,43 +128,6 @@ const FeatureDesc = styled.p`
     margin-top: 12px;
 `;
 
-const DeploymentsSection = styled.section`
-    width: 100%;
-    max-width: 1200px;
-    padding: 60px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-`;
-
-const DeploymentCard = styled.div`
-    background-color: ${({ theme }) => theme.colors.surface};
-    padding: 24px;
-    border-radius: ${({ theme }) => theme.borderRadius.md};
-    width: 280px;
-    text-align: center;
-    box-shadow: ${({ theme }) => theme.shadows.md};
-    transition: ${({ theme }) => theme.transitions.default};
-
-    &:hover {
-        box-shadow: ${({ theme }) => theme.colors.glowPrimary};
-        transform: translateY(-5px);
-    }
-`;
-
-const DeploymentName = styled.h3`
-    font-size: 20px;
-    margin-bottom: 12px;
-`;
-
-const DeploymentStatus = styled.p`
-    font-size: 14px;
-    color: ${({ theme }) => theme.colors.textSecondary};
-`;
-
 const CTASection = styled.section`
     width: 100%;
     padding: 60px 20px;
@@ -190,8 +154,10 @@ const HomePage = ({ LoginData }) => {
 
     const fetchDeployments = async () => {
         try {
-            // const res = await DeploymentService.getMyDeployments(); // your API call
-            // setDeployments(res.data.deployments);
+            const res = await DeploymentService.getMyDeployments({
+                pageSize: 9,
+            });
+            setDeployments(res.data);
         } catch (err) {
             console.error("Failed to fetch deployments", err);
         }
@@ -234,26 +200,7 @@ const HomePage = ({ LoginData }) => {
                 </HeroSection>
 
                 {/* Logged-in: Deployments Section */}
-                {isLoggedIn && (
-                    <DeploymentsSection>
-                        {deployments.length > 0 ? (
-                            deployments.map((deployment) => (
-                                <DeploymentCard key={deployment.id}>
-                                    <DeploymentName>
-                                        {deployment.name}
-                                    </DeploymentName>
-                                    <DeploymentStatus>
-                                        {deployment.status}
-                                    </DeploymentStatus>
-                                </DeploymentCard>
-                            ))
-                        ) : (
-                            <DeploymentStatus>
-                                No deployments found. Start by deploying one!
-                            </DeploymentStatus>
-                        )}
-                    </DeploymentsSection>
-                )}
+                {isLoggedIn && <Dashboard />}
 
                 {/* Logged-out: Features Section */}
                 <FeaturesSection>

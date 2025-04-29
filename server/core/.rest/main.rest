@@ -1,12 +1,12 @@
 @hostname = localhost
-@port1 = 8080
+@port1 = 9069
 @port = 8081
-@host = orbitdeck.app/api/core
-@authHost = orbitdeck.app/api/auth
-# @host = {{hostname}}:{{port}}
+# @host = orbitdeck.app/api/core
+# @authHost = orbitdeck.app/api/auth
+@authHost = {{hostname}}:{{port1}}
+@host = {{hostname}}:{{port}}
 
 @contentType = application/json
-
 
 ###
 # @name Register
@@ -31,23 +31,21 @@ Content-Type: {{contentType}}
     "password": "Qwe@123456"
 }
 
-@login_token = {{login.response.body.access_token}}
-
+###
+GET http://{{host}}/deployment?pageNo=5
+Content-Type: {{contentType}}
 
 ###
 GET http://{{host}}/deployment/1
 Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
 
 ###
 POST http://{{host}}/deployment/1
 Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
 
 ###
 POST http://{{host}}/deployment/add
 Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
 
 {
   "name": "user-service",
@@ -92,7 +90,6 @@ Authorization: Bearer {{login_token}}
 ###
 POST http://{{host}}/deployment/add
 Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
 
 {
   "name": "main",
@@ -203,7 +200,6 @@ Authorization: Bearer {{login_token}}
 ###
 POST http://{{host}}/deployment/add
 Content-Type: {{contentType}}
-Authorization: Bearer {{login_token}}
 
 {
   "name": "main",

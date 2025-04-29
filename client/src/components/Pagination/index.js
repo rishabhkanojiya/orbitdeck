@@ -1,52 +1,56 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Loader from "../Loader";
 import { debounce } from "lodash";
 
 const Pagination = ({ data, Service, children }) => {
     const [items, setItems] = useState(data?.items ?? []);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [hasNextPage, setHasNextPage] = useState(true);
+    const [currentPage, setCurrentPage] = useState(data?.page?.current ?? 1);
+    const [hasNextPage, setHasNextPage] = useState(data?.page?.hasNext ?? true);
+    const [loading, setLoading] = useState(false);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
+        setLoading(true);
         try {
-            const response = await Service({ pageNo: currentPage });
-            const { items, page } = response.data;
-            setItems((prevItems) => [...prevItems, ...items]);
-            setCurrentPage(page.current);
+            const response = await Service({
+                pageNo: currentPage,
+                pageSize: 9,
+            });
+            const { items: newItems, page } = response.data;
+
+            setItems((prevItems) => [...prevItems, ...newItems]);
             setHasNextPage(page.hasNext);
-        } catch (error) {
-            console.error("Error fetching data:", error);
+        } catch (err) {
+            console.error("Pagination fetch failed:", err);
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [Service, currentPage]);
 
-    const handleScroll = () => {
-        const { scrollTop, clientHeight, scrollHeight } =
+    const handleScroll = debounce(() => {
+        const { scrollTop, scrollHeight, clientHeight } =
             document.documentElement;
-
-        if (scrollTop + clientHeight >= scrollHeight) {
-            setCurrentPage((prevPage) => prevPage + 1);
+        if (
+            scrollTop + clientHeight >= scrollHeight - 10 &&
+            hasNextPage &&
+            !loading
+        ) {
+            setCurrentPage((prev) => prev + 1);
         }
-    };
+    }, 200);
 
     useEffect(() => {
-        data?.page?.current != currentPage && hasNextPage && fetchData();
+        fetchData();
     }, [currentPage]);
 
     useEffect(() => {
-        const debounceScroll = debounce(handleScroll, 200);
-
-        window.addEventListener("scroll", debounceScroll);
-
-        return () => {
-            window.removeEventListener("scroll", debounceScroll);
-        };
-    }, []);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [handleScroll]);
 
     return (
         <>
             {children({ items })}
-
-            {hasNextPage && <Loader />}
+            {loading && <Loader />}
         </>
     );
 };

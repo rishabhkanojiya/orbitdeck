@@ -10,6 +10,17 @@ import (
 	"database/sql"
 )
 
+const countDeployments = `-- name: CountDeployments :one
+SELECT COUNT(*) FROM deployments
+`
+
+func (q *Queries) CountDeployments(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countDeployments)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createComponent = `-- name: CreateComponent :one
 INSERT INTO components (deployment_id, name, replica_count, service_port)
 VALUES ($1, $2, $3, $4)
@@ -241,6 +252,46 @@ func (q *Queries) GetDeploymentComponents(ctx context.Context, deploymentID int6
 			&i.RequestsMemory,
 			&i.LimitsCpu,
 			&i.LimitsMemory,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listDeploymentsPaginated = `-- name: ListDeploymentsPaginated :many
+SELECT id, name, environment, helm_release, created_at FROM deployments
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListDeploymentsPaginatedParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeploymentsPaginatedParams) ([]Deployment, error) {
+	rows, err := q.db.QueryContext(ctx, listDeploymentsPaginated, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Deployment{}
+	for rows.Next() {
+		var i Deployment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Environment,
+			&i.HelmRelease,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

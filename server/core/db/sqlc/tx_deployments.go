@@ -208,3 +208,37 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 func generateHelmReleaseName(name, env string) string {
 	return "orbit-" + name + "-" + env
 }
+
+type PaginatedDeploymentsResult struct {
+	Results []DeploymentParams
+	Total   int64
+}
+
+func (store *SQLStore) GetPaginatedDeploymentObjects(ctx context.Context, limit, offset int32) (PaginatedDeploymentsResult, error) {
+	deployments, err := store.Queries.ListDeploymentsPaginated(ctx, ListDeploymentsPaginatedParams{
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		return PaginatedDeploymentsResult{}, fmt.Errorf("failed to list deployments: %w", err)
+	}
+
+	total, err := store.Queries.CountDeployments(ctx)
+	if err != nil {
+		return PaginatedDeploymentsResult{}, fmt.Errorf("failed to count deployments: %w", err)
+	}
+
+	var allDeployments []DeploymentParams
+	for _, deployment := range deployments {
+		fullDeployment, err := store.GetDeploymentObject(ctx, deployment.ID)
+		if err != nil {
+			return PaginatedDeploymentsResult{}, fmt.Errorf("failed to get deployment object for ID %d: %w", deployment.ID, err)
+		}
+		allDeployments = append(allDeployments, fullDeployment)
+	}
+
+	return PaginatedDeploymentsResult{
+		Results: allDeployments,
+		Total:   total,
+	}, nil
+}

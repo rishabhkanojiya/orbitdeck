@@ -9,6 +9,7 @@ import (
 )
 
 type Querier interface {
+	CountDeployments(ctx context.Context) (int64, error)
 	CreateComponent(ctx context.Context, arg CreateComponentParams) (Component, error)
 	CreateDeployment(ctx context.Context, arg CreateDeploymentParams) (Deployment, error)
 	CreateEnvVar(ctx context.Context, arg CreateEnvVarParams) (EnvVar, error)
@@ -21,6 +22,7 @@ type Querier interface {
 	GetDeploymentComponents(ctx context.Context, deploymentID int64) ([]GetDeploymentComponentsRow, error)
 	GetIngressByDeployment(ctx context.Context, deploymentID int64) ([]Ingress, error)
 	GetIngressByHost(ctx context.Context, host string) (Ingress, error)
+	ListDeploymentsPaginated(ctx context.Context, arg ListDeploymentsPaginatedParams) ([]Deployment, error)
 }
 
 var _ Querier = (*Queries)(nil)

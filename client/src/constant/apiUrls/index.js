@@ -1,6 +1,6 @@
 import environment from "../../environment";
 
-const deploymentUrl = "/deployment";
+const deploymentUrl = "deployment";
 
 export const URLS = {
     registerUser: `${environment.AUTH_API_URL}/users`,
@@ -9,7 +9,7 @@ export const URLS = {
     resetPassword: `${environment.AUTH_API_URL}/users/renew_access`,
     me: `${environment.AUTH_API_URL}/me`,
 
-    deployments: `${environment.API_URL}/${deploymentUrl}`,
-    deployment: `${environment.API_URL}/${deploymentUrl}/:deploymentId`,
-    deploymentAdd: `${environment.API_URL}/${deploymentUrl}/add`,
+    deployments: `${environment.CORE_API_URL}/${deploymentUrl}`,
+    deployment: `${environment.CORE_API_URL}/${deploymentUrl}/:deploymentId`,
+    deploymentAdd: `${environment.CORE_API_URL}/${deploymentUrl}/add`,
 };
