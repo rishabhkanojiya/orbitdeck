@@ -53,3 +53,7 @@ UPDATE deployments
 SET task_id = $2
 WHERE id = $1;
     
+
+-- name: DeleteDeploymentCascade :exec
+DELETE FROM deployments
+WHERE id = $1;

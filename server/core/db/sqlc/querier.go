@@ -16,6 +16,7 @@ type Querier interface {
 	CreateImage(ctx context.Context, arg CreateImageParams) (Image, error)
 	CreateIngress(ctx context.Context, arg CreateIngressParams) (Ingress, error)
 	CreateResources(ctx context.Context, arg CreateResourcesParams) (Resource, error)
+	DeleteDeploymentCascade(ctx context.Context, id int64) error
 	DeleteIngress(ctx context.Context, id int64) error
 	GetComponentEnvVars(ctx context.Context, componentID int64) ([]GetComponentEnvVarsRow, error)
 	GetDeployment(ctx context.Context, id int64) (Deployment, error)

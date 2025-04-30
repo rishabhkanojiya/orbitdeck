@@ -69,7 +69,7 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 
 	for _, comp := range req.Components {
 		if comp.Image.Repository == "" {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "image repository is required"})
+			ctx.JSON(errorResponse(http.StatusBadRequest, errors.New("image repository is required")))
 			return
 		}
 	}
@@ -81,7 +81,7 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 	}
 
 	if req.Ingress == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ingress value is required"})
+		ctx.JSON(errorResponse(http.StatusBadRequest, errors.New("ingress value is required")))
 		return
 	}
 
@@ -91,7 +91,7 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 
 	AfterCreate := func(id int64) (string, error) {
 		taskPayload := &worker.PayloadGenerateHelm{Id: id}
-		opts := []asynq.Option{asynq.MaxRetry(1), asynq.ProcessIn(1 * time.Second), asynq.Queue(worker.QueueCore)}
+		opts := []asynq.Option{asynq.MaxRetry(1), asynq.ProcessIn(1 * time.Second), asynq.Queue(worker.QueueGenerate)}
 		info, err := server.taskDistributor.DistributeTaskGenerateHelm(ctx, taskPayload, opts...)
 		if err != nil {
 			return "", err
@@ -191,10 +191,10 @@ func (server *Server) GetDeployment(c *gin.Context) {
 	deployment, err := server.store.GetDeploymentObject(c.Request.Context(), int64(id))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "deployment not found"})
+			c.JSON(errorResponse(http.StatusNotFound, errors.New("deployment not found")))
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -246,10 +246,10 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 	deployment, err := server.store.GetDeployment(c.Request.Context(), int64(id))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "deployment not found"})
+			c.JSON(errorResponse(http.StatusNotFound, errors.New("deployment not found")))
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 
@@ -259,9 +259,15 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 	opts := []asynq.Option{
 		asynq.MaxRetry(0),
 		asynq.ProcessIn(1 * time.Second),
-		asynq.Queue(worker.QueueCore),
+		asynq.Queue(worker.QueueUninstall),
 	}
 	server.taskDistributor.DistributeTaskUninstallHelm(c, taskPayload, opts...)
+
+	// err = server.store.DeleteDeployment(c, id)
+	// if err != nil {
+	// 	c.JSON(errorResponse(http.StatusNotFound, errors.New("failed to delete deployment from DB")))
+	// 	return
+	// }
 
 	c.JSON(http.StatusOK, gin.H{
 		"deployment": deployment,
@@ -283,14 +289,14 @@ func (server *Server) GetDeploymentStatus(ctx *gin.Context) {
 	}
 
 	if !deployment.TaskID.Valid {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "No task associated with deployment"})
+		ctx.JSON(errorResponse(http.StatusNotFound, errors.New("no task associated with deployment")))
 		return
 	}
 
 	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS}) // adjust config
-	info, err := inspector.GetTaskInfo(worker.QueueCore, deployment.TaskID.String)
+	info, err := inspector.GetTaskInfo(worker.QueueGenerate, deployment.TaskID.String)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
 	log.Debug().Interface("Info", info).Msg("Task Info")

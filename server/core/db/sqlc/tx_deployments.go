@@ -214,6 +214,7 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 		Name:        deployment.Name,
 		Environment: string(deployment.Environment),
 		HelmRelease: deployment.HelmRelease.String,
+		TaskId:      deployment.TaskID.String,
 		CreatedAt:   sql.NullTime{Time: deployment.CreatedAt, Valid: true},
 		Components:  compParams,
 		Ingress:     ingressParams,
@@ -256,4 +257,8 @@ func (store *SQLStore) GetPaginatedDeploymentObjects(ctx context.Context, limit,
 		Results: allDeployments,
 		Total:   total,
 	}, nil
+}
+
+func (store *SQLStore) DeleteDeployment(ctx context.Context, id int64) error {
+	return store.Queries.DeleteDeploymentCascade(ctx, id)
 }

@@ -36,16 +36,15 @@ GET http://{{host}}/deployment?pageNo=1
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/4
-Content-Type: {{contentType}}
-
-# Delete
-###
-POST http://{{host}}/deployment/1
+GET http://{{host}}/deployment/48
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/4/status
+DELETE  http://{{host}}/deployment/48
+Content-Type: {{contentType}}
+
+###
+GET http://{{host}}/deployment/48/status
 
 
 ###
@@ -59,7 +58,7 @@ Content-Type: {{contentType}}
     {
       "name": "user",
       "image": {
-        "repository": "rishabh75/orbitdeck-user",
+        "repository": "rishabh75/sample-node",
         "tag": "latest"
       },
       "replica_count": 1,

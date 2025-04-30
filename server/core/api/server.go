@@ -61,7 +61,7 @@ func (server *Server) setupRouter() {
 	deploymentRoutes.GET("", server.GetDeployments)
 	deploymentRoutes.POST("/add", server.CreateDeployment)
 	deploymentRoutes.GET("/:id", server.GetDeployment)
-	deploymentRoutes.POST("/:id", server.UninstallDeployment)
+	deploymentRoutes.DELETE("/:id", server.UninstallDeployment)
 	deploymentRoutes.GET("/:id/status", server.GetDeploymentStatus)
 
 	server.router = router

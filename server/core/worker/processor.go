@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	QueueCore     = "core"
-	QueueCritical = "critical"
-	QueueDefault  = "default"
+	QueueGenerate  = "generate"
+	QueueUninstall = "uninstall"
+	QueueCritical  = "critical"
+	QueueDefault   = "default"
 )
 
 type TaskProcessor interface {
@@ -34,9 +35,10 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSv
 		redisOpt,
 		asynq.Config{
 			Queues: map[string]int{
-				QueueCore:     10,
-				QueueCritical: 10,
-				QueueDefault:  5,
+				QueueGenerate:  3,
+				QueueUninstall: 3,
+				QueueCritical:  5,
+				QueueDefault:   1,
 			},
 			ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
 				log.Error().Err(err).Str("type", task.Type()).

@@ -160,6 +160,16 @@ func (q *Queries) CreateResources(ctx context.Context, arg CreateResourcesParams
 	return i, err
 }
 
+const deleteDeploymentCascade = `-- name: DeleteDeploymentCascade :exec
+DELETE FROM deployments
+WHERE id = $1
+`
+
+func (q *Queries) DeleteDeploymentCascade(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteDeploymentCascade, id)
+	return err
+}
+
 const getComponentEnvVars = `-- name: GetComponentEnvVars :many
 SELECT key, value FROM env_vars WHERE component_id = $1
 `

@@ -46,7 +46,7 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		deployment.HelmRelease,
 		s.chartPath,
 		"-f", valuesPath,
-		"-n", "orbit-" + deployment.Environment,
+		"-n", fmt.Sprintf("orbit-%s-%d", deployment.Environment, deployment.ID),
 		"--create-namespace",
 		"--wait",
 		"--timeout", s.helmTimeout.String(),
@@ -75,7 +75,9 @@ func (s *HelmService) Uninstall(deployment db.Deployment) error {
 	args := []string{
 		"uninstall",
 		deployment.HelmRelease.String,
-		"-n", "orbit-" + string(deployment.Environment),
+		"-n", fmt.Sprintf("orbit-%s-%d", deployment.Environment, deployment.ID),
+		// "&&",
+		// fmt.Sprintf("kubectl delete namespace orbit-%s-%d", deployment.Environment, deployment.ID),
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
