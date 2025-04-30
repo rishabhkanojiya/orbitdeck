@@ -6,6 +6,7 @@ CREATE TABLE "deployments" (
     "environment" "environment" NOT NULL DEFAULT 'dev',
     "helm_release" varchar,
     "task_id" varchar,
+    "status" varchar,
     "created_at" timestamptz NOT NULL DEFAULT now()
 );
 

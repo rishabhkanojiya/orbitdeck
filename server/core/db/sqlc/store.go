@@ -12,6 +12,7 @@ type Store interface {
 	GetDeploymentObject(ctx context.Context, id int64) (DeploymentParams, error)
 	GetPaginatedDeploymentObjects(ctx context.Context, limit, offset int32) (PaginatedDeploymentsResult, error)
 	DeleteDeployment(ctx context.Context, id int64) error
+	SetDeploymentStatus(ctx context.Context, id int64, status string) error
 }
 
 // Store provides all functions to execute db queries and transaction
@@ -45,4 +46,11 @@ func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) erro
 	}
 
 	return tx.Commit()
+}
+
+func (store *SQLStore) SetDeploymentStatus(ctx context.Context, id int64, status string) error {
+	return store.Queries.UpdateDeploymentStatus(ctx, UpdateDeploymentStatusParams{
+		ID:     id,
+		Status: sql.NullString{String: status, Valid: true},
+	})
 }

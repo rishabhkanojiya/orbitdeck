@@ -30,16 +30,27 @@ type RedisTaskProcessor struct {
 	helmSvc *service.HelmService
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSvc *service.HelmService) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSvc *service.HelmService, workerType string) TaskProcessor {
+	var queueConfig map[string]int
+
+	switch workerType {
+	case "generate-helm":
+		queueConfig = map[string]int{QueueGenerate: 1}
+	case "uninstall-helm":
+		queueConfig = map[string]int{QueueUninstall: 1}
+	default:
+		queueConfig = map[string]int{
+			QueueGenerate:  3,
+			QueueUninstall: 3,
+			QueueCritical:  5,
+			QueueDefault:   1,
+		}
+	}
+
 	server := asynq.NewServer(
 		redisOpt,
 		asynq.Config{
-			Queues: map[string]int{
-				QueueGenerate:  3,
-				QueueUninstall: 3,
-				QueueCritical:  5,
-				QueueDefault:   1,
-			},
+			Queues: queueConfig,
 			ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
 				log.Error().Err(err).Str("type", task.Type()).
 					Bytes("payload", task.Payload()).Msg("process task failed")

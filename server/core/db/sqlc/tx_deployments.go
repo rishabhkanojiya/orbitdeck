@@ -12,6 +12,7 @@ type DeploymentParams struct {
 	Environment string
 	HelmRelease string
 	TaskId      string
+	Status      string
 	Components  []ComponentParams
 	Ingress     []IngressParams // Add ingress support
 	CreatedAt   sql.NullTime
@@ -215,6 +216,7 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 		Environment: string(deployment.Environment),
 		HelmRelease: deployment.HelmRelease.String,
 		TaskId:      deployment.TaskID.String,
+		Status:      deployment.Status.String,
 		CreatedAt:   sql.NullTime{Time: deployment.CreatedAt, Valid: true},
 		Components:  compParams,
 		Ingress:     ingressParams,

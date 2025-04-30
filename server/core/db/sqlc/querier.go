@@ -24,6 +24,7 @@ type Querier interface {
 	GetIngressByDeployment(ctx context.Context, deploymentID int64) ([]Ingress, error)
 	GetIngressByHost(ctx context.Context, host string) (Ingress, error)
 	ListDeploymentsPaginated(ctx context.Context, arg ListDeploymentsPaginatedParams) ([]Deployment, error)
+	UpdateDeploymentStatus(ctx context.Context, arg UpdateDeploymentStatusParams) error
 	UpdateDeploymentTaskID(ctx context.Context, arg UpdateDeploymentTaskIDParams) error
 }
 

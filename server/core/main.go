@@ -71,7 +71,7 @@ func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store
 
 	helmSvc := service.NewHelmService(filepath.Join("config", "infra", "helm"))
 
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, helmSvc)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, helmSvc, workerType)
 
 	log.Info().Msgf("Starting task processor for: %s", workerType)
 

@@ -46,18 +46,26 @@ func (processor *RedisTaskProcessor) ProcessTaskGenerateHelm(ctx context.Context
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return fmt.Errorf("failed to unmarshal payload: %w", asynq.SkipRetry)
 	}
+
+	_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "installed")
+
 	deployment, err := processor.store.GetDeploymentObject(ctx, payload.Id)
 
 	if err != nil {
+		_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "failed")
 		return err
 	}
 
 	err = processor.helmSvc.Deploy(deployment)
 
 	if err != nil {
+		_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "failed")
 		return fmt.Errorf("failed to Deploy: %w", err)
 	}
-
+	_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "installed")
+	if err != nil {
+		return fmt.Errorf("helm succeeded but failed to update status: %w", err)
+	}
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).
 		Str("name", deployment.Name).Msg("processed task")
 	return nil

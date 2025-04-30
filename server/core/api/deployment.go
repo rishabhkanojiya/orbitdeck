@@ -263,11 +263,11 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 	}
 	server.taskDistributor.DistributeTaskUninstallHelm(c, taskPayload, opts...)
 
-	// err = server.store.DeleteDeployment(c, id)
-	// if err != nil {
-	// 	c.JSON(errorResponse(http.StatusNotFound, errors.New("failed to delete deployment from DB")))
-	// 	return
-	// }
+	err = server.store.DeleteDeployment(c, id)
+	if err != nil {
+		c.JSON(errorResponse(http.StatusNotFound, errors.New("failed to delete deployment from DB")))
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"deployment": deployment,
@@ -295,6 +295,7 @@ func (server *Server) GetDeploymentStatus(ctx *gin.Context) {
 
 	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS}) // adjust config
 	info, err := inspector.GetTaskInfo(worker.QueueGenerate, deployment.TaskID.String)
+	log.Debug().Interface("info", info).Msg("info")
 	if err != nil {
 		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return

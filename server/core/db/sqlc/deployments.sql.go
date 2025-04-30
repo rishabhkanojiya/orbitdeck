@@ -55,7 +55,7 @@ func (q *Queries) CreateComponent(ctx context.Context, arg CreateComponentParams
 const createDeployment = `-- name: CreateDeployment :one
 INSERT INTO deployments (name, environment, helm_release)
 VALUES ($1, $2, $3)
-RETURNING id, name, environment, helm_release, task_id, created_at
+RETURNING id, name, environment, helm_release, task_id, status, created_at
 `
 
 type CreateDeploymentParams struct {
@@ -73,6 +73,7 @@ func (q *Queries) CreateDeployment(ctx context.Context, arg CreateDeploymentPara
 		&i.Environment,
 		&i.HelmRelease,
 		&i.TaskID,
+		&i.Status,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -203,7 +204,7 @@ func (q *Queries) GetComponentEnvVars(ctx context.Context, componentID int64) ([
 }
 
 const getDeployment = `-- name: GetDeployment :one
-SELECT id, name, environment, helm_release, task_id, created_at FROM deployments WHERE id = $1
+SELECT id, name, environment, helm_release, task_id, status, created_at FROM deployments WHERE id = $1
 `
 
 func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, error) {
@@ -215,6 +216,7 @@ func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, erro
 		&i.Environment,
 		&i.HelmRelease,
 		&i.TaskID,
+		&i.Status,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -279,7 +281,7 @@ func (q *Queries) GetDeploymentComponents(ctx context.Context, deploymentID int6
 }
 
 const listDeploymentsPaginated = `-- name: ListDeploymentsPaginated :many
-SELECT id, name, environment, helm_release, task_id, created_at FROM deployments
+SELECT id, name, environment, helm_release, task_id, status, created_at FROM deployments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -304,6 +306,7 @@ func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeployme
 			&i.Environment,
 			&i.HelmRelease,
 			&i.TaskID,
+			&i.Status,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -317,6 +320,22 @@ func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeployme
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateDeploymentStatus = `-- name: UpdateDeploymentStatus :exec
+UPDATE deployments
+SET status = $2
+WHERE id = $1
+`
+
+type UpdateDeploymentStatusParams struct {
+	ID     int64          `json:"id"`
+	Status sql.NullString `json:"status"`
+}
+
+func (q *Queries) UpdateDeploymentStatus(ctx context.Context, arg UpdateDeploymentStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateDeploymentStatus, arg.ID, arg.Status)
+	return err
 }
 
 const updateDeploymentTaskID = `-- name: UpdateDeploymentTaskID :exec

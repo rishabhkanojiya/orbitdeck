@@ -47,12 +47,15 @@ LIMIT $1 OFFSET $2;
 -- name: CountDeployments :one
 SELECT COUNT(*) FROM deployments;
 
-
 -- name: UpdateDeploymentTaskID :exec
 UPDATE deployments
 SET task_id = $2
 WHERE id = $1;
-    
+
+-- name: UpdateDeploymentStatus :exec
+UPDATE deployments
+SET status = $2
+WHERE id = $1;
 
 -- name: DeleteDeploymentCascade :exec
 DELETE FROM deployments

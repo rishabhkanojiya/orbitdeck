@@ -36,15 +36,15 @@ GET http://{{host}}/deployment?pageNo=1
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/48
+GET http://{{host}}/deployment/7
 Content-Type: {{contentType}}
 
 ###
-DELETE  http://{{host}}/deployment/48
+DELETE  http://{{host}}/deployment/49
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/48/status
+GET http://{{host}}/deployment/50/status
 
 
 ###
