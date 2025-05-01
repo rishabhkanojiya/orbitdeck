@@ -40,11 +40,11 @@ GET http://{{host}}/deployment/7
 Content-Type: {{contentType}}
 
 ###
-DELETE  http://{{host}}/deployment/49
+DELETE  http://{{host}}/deployment/53
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/41/status
+GET http://{{host}}/deployment/53/status
 
 
 ###

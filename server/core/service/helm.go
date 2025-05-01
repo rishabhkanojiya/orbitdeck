@@ -69,31 +69,40 @@ func (s *HelmService) Deploy(deployment db.DeploymentParams) error {
 		Str("output", string(output)).Msg("Helm deployment successful")
 	return nil
 }
-
 func (s *HelmService) Uninstall(deployment db.Deployment) error {
+	namespace := fmt.Sprintf("orbit-%s-%d", deployment.Environment, deployment.ID)
 
-	args := []string{
+	helmArgs := []string{
 		"uninstall",
 		deployment.HelmRelease.String,
-		"-n", fmt.Sprintf("orbit-%s-%d", deployment.Environment, deployment.ID),
-		// "&&",
-		// fmt.Sprintf("kubectl delete namespace orbit-%s-%d", deployment.Environment, deployment.ID),
+		"-n", namespace,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.helmTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "helm", args...)
-
-	output, err := cmd.CombinedOutput()
+	helmCmd := exec.CommandContext(ctx, "helm", helmArgs...)
+	helmOutput, err := helmCmd.CombinedOutput()
 	if err != nil {
-		log.Debug().Str("args", fmt.Sprintf("%v", args)).Msg("Helm command arguments")
-		log.Error().Err(err).Int64("id", deployment.ID).Str("output", string(output)).Msg("Helm command failed")
-		return fmt.Errorf("helm command failed: %s", output)
+		log.Debug().Str("args", fmt.Sprintf("%v", helmArgs)).Msg("Helm command arguments")
+		log.Error().Err(err).Int64("id", deployment.ID).Str("output", string(helmOutput)).Msg("Helm uninstall failed")
+		return fmt.Errorf("helm uninstall failed: %s", helmOutput)
 	}
 
 	log.Info().Str("Release", deployment.HelmRelease.String).
-		Str("output", string(output)).Msg("Helm Uninstall successful")
+		Str("output", string(helmOutput)).Msg("Helm Uninstall successful")
+
+	kubectlArgs := []string{"delete", "namespace", namespace}
+	kubectlCmd := exec.CommandContext(ctx, "kubectl", kubectlArgs...)
+	kubectlOutput, err := kubectlCmd.CombinedOutput()
+	if err != nil {
+		log.Error().Err(err).Str("output", string(kubectlOutput)).Msg("Namespace deletion failed")
+		return fmt.Errorf("failed to delete namespace: %s", kubectlOutput)
+	}
+
+	log.Info().Str("Namespace", namespace).
+		Str("output", string(kubectlOutput)).Msg("Namespace deleted successfully")
+
 	return nil
 }
 

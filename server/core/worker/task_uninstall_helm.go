@@ -48,10 +48,18 @@ func (processor *RedisTaskProcessor) ProcessTaskUninstallHelm(ctx context.Contex
 		return err
 	}
 
+	log.Debug().Interface("deployment", deployment).Msg("deployment")
+
 	err = processor.helmSvc.Uninstall(deployment)
 
 	if err != nil {
 		return fmt.Errorf("failed to Uninstall Helm: %w", err)
+	}
+
+	err = processor.store.DeleteDeployment(ctx, deployment.ID)
+	if err != nil {
+		log.Error().Str("type", task.Type()).Bytes("payload", task.Payload()).
+			Str("name", deployment.Name).Msg("failed to delete deployment from DB")
 	}
 
 	log.Info().Str("type", task.Type()).Bytes("payload", task.Payload()).

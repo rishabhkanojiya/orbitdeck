@@ -262,12 +262,6 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 	}
 	server.taskDistributor.DistributeTaskUninstallHelm(c, taskPayload, opts...)
 
-	err = server.store.DeleteDeployment(c, id)
-	if err != nil {
-		c.JSON(errorResponse(http.StatusNotFound, errors.New("failed to delete deployment from DB")))
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"deployment": deployment,
 		"Message":    fmt.Sprintf("Helm Release %s will be removed soon", deployment.HelmRelease.String),
