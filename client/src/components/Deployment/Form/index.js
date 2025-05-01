@@ -166,13 +166,19 @@ const DeploymentForm = ({ ShowPopupData }) => {
 
     const onSubmit = async (data) => {
         try {
-            await DeploymentService.createDeployment(data);
+            const deployment = await DeploymentService.createDeployment(data);
+
             ShowPopupData.setPopupMessageObj(
                 { message: "Deployment currently in progress" },
                 "success",
             );
 
-            history.push("/dashboard");
+            const id = deployment?.data?.id;
+            if (id) {
+                history.push(`/deployment/${id}`);
+            } else {
+                history.push("/dashboard");
+            }
         } catch (error) {
             console.error(error.response?.data || error.message);
             ShowPopupData.setPopupMessageObj(

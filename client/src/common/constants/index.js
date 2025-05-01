@@ -49,7 +49,7 @@ export const skillIconUrls = {
     rabbitmq: getSkillIcons("rabbitmq"),
 };
 
-const queueEnums = {
+export const queueEnums = {
     1: "pending",
     2: "active",
     3: "scheduled",
@@ -57,3 +57,5 @@ const queueEnums = {
     5: "archived",
     6: "completed",
 };
+
+export const terminalStates = new Set(["retry", "archived", "completed"]);

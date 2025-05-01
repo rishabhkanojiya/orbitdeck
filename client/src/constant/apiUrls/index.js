@@ -12,4 +12,5 @@ export const URLS = {
     deployments: `${environment.CORE_API_URL}/${deploymentUrl}`,
     deployment: `${environment.CORE_API_URL}/${deploymentUrl}/:deploymentId`,
     deploymentAdd: `${environment.CORE_API_URL}/${deploymentUrl}/add`,
+    deploymentStatus: `${environment.CORE_API_URL}/${deploymentUrl}/:deploymentId/status`,
 };

@@ -49,6 +49,14 @@ const Card = styled.div`
     }
 `;
 
+const CardHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+`;
+
 const CardTitle = styled.h3`
     font-size: 20px;
     margin-bottom: 8px;
@@ -83,6 +91,34 @@ const EmptyState = styled.div`
     font-size: 16px;
     color: ${({ theme }) => theme.colors.textSecondary};
     margin-top: 40px;
+`;
+
+const StatusBadge = styled.span`
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+
+    background-color: ${
+        ({ status }) =>
+            status === "installed"
+                ? "#22c55e" // green
+                : status === "installing"
+                ? "#facc15" // yellow
+                : "#ef4444" // red
+    };
+    box-shadow: 0 0 8px
+        ${({ status }) =>
+            status === "installed"
+                ? "#22c55eaa"
+                : status === "installing"
+                ? "#facc15aa"
+                : "#ef4444aa"};
 `;
 
 const formatDate = (iso) => {
@@ -145,28 +181,52 @@ const Dashboard = () => {
                         <>
                             <Grid>
                                 {items.map((d) => (
-                                    <Card key={d.ID}>
-                                        <CardTitle>{d.Name}</CardTitle>
-                                        <SubInfo>Env: {d.Environment}</SubInfo>
-                                        <SubInfo>Helm: {d.HelmRelease}</SubInfo>
-                                        <SubInfo>
-                                            Created:{" "}
-                                            {formatDate(d.CreatedAt?.Time)}
-                                        </SubInfo>
-                                        {d.Components?.length > 0 && (
-                                            <LogoStack>
-                                                {extractSkillIcons(
-                                                    d.Components,
-                                                ).map((key) => (
-                                                    <Logo
-                                                        key={key}
-                                                        src={skillIconUrls[key]}
-                                                        alt={key}
-                                                    />
-                                                ))}
-                                            </LogoStack>
-                                        )}
-                                    </Card>
+                                    <Link
+                                        to={`/deployment/${d.ID}`}
+                                        style={{
+                                            textDecoration: "none",
+                                            color: "inherit",
+                                        }}
+                                    >
+                                        <Card key={d.ID}>
+                                            <CardHeader>
+                                                <CardTitle>{d.Name}</CardTitle>
+                                                <StatusBadge
+                                                    status={d.Status?.toLowerCase()}
+                                                >
+                                                    {d.Status}
+                                                </StatusBadge>
+                                            </CardHeader>
+                                            <SubInfo>
+                                                Env: {d.Environment}
+                                            </SubInfo>
+                                            <SubInfo>
+                                                Helm: {d.HelmRelease}
+                                            </SubInfo>
+                                            <SubInfo>
+                                                Created:{" "}
+                                                {formatDate(d.CreatedAt?.Time)}
+                                            </SubInfo>
+
+                                            {d.Components?.length > 0 && (
+                                                <LogoStack>
+                                                    {extractSkillIcons(
+                                                        d.Components,
+                                                    ).map((key) => (
+                                                        <Logo
+                                                            key={key}
+                                                            src={
+                                                                skillIconUrls[
+                                                                    key
+                                                                ]
+                                                            }
+                                                            alt={key}
+                                                        />
+                                                    ))}
+                                                </LogoStack>
+                                            )}
+                                        </Card>
+                                    </Link>
                                 ))}
                             </Grid>
                         </>

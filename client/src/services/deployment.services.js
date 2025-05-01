@@ -24,11 +24,21 @@ export const DeploymentService = {
         );
     },
 
+    getDeploymentStatus(formData) {
+        const { deploymentId } = formData;
+        const axiosOptions = {};
+
+        return ApiService.get(
+            URLS.deploymentStatus.replace(":deploymentId", deploymentId),
+            axiosOptions,
+        );
+    },
+
     uninstallDeployment(formData) {
         const { deploymentId } = formData;
         const axiosOptions = {};
 
-        return ApiService.post(
+        return ApiService.delete(
             URLS.deployment.replace(":deploymentId", deploymentId),
             axiosOptions,
         );

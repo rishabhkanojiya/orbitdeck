@@ -12,7 +12,6 @@ import (
 	"github.com/hibiken/asynq"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
-	"github.com/rs/zerolog/log"
 )
 
 type CreateDeploymentRequest struct {
@@ -295,12 +294,10 @@ func (server *Server) GetDeploymentStatus(ctx *gin.Context) {
 
 	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS}) // adjust config
 	info, err := inspector.GetTaskInfo(worker.QueueGenerate, deployment.TaskID.String)
-	log.Debug().Interface("info", info).Msg("info")
 	if err != nil {
 		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
 	}
-	log.Debug().Interface("Info", info).Msg("Task Info")
 	ctx.JSON(http.StatusOK, gin.H{
 		"state": info.State, // pending, active, succeeded, failed
 	})
