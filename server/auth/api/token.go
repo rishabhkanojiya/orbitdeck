@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -96,4 +97,11 @@ func (server *Server) setAccessTokenCookie(ctx *gin.Context, accessToken string,
 		int(time.Until(expiresAt).Seconds()),
 		cookiePath, "", secure, httpOnly,
 	)
+}
+
+func (server *Server) LogoutUser(ctx *gin.Context) {
+	ctx.SetCookie("access_token", "", -1, "/", "", false, true)
+	ctx.SetCookie("refresh_token", "", -1, "/", "", false, true)
+
+	ctx.JSON(errorResponse(http.StatusOK, errors.New("Logged out successfully")))
 }

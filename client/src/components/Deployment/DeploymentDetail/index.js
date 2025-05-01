@@ -3,7 +3,6 @@ import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { skillIconUrls, terminalStates } from "../../../common/constants";
 import { DeploymentService } from "../../../services/deployment.services";
-import FloatingIcons from "../../FloatingIcons";
 import { PrimaryButton } from "../../Button";
 import { Consume } from "../../../context/Consumer";
 import { ShowPopupContext } from "../../../context";
@@ -208,7 +207,6 @@ const DeploymentDetail = ({ ShowPopupData }) => {
 
     return (
         <>
-            <FloatingIcons />
             <PageWrapper>
                 <Container>
                     <BackLink onClick={() => history.goBack()}>

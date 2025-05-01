@@ -147,6 +147,19 @@ const Footer = styled.footer`
     text-align: center;
     font-size: 14px;
     color: ${({ theme }) => theme.colors.textSecondary};
+    backdrop-filter: blur(6px);
+    margin-top: auto;
+`;
+
+const FooterLink = styled(Link)`
+    color: ${({ theme }) => theme.colors.primary};
+    margin: 0 8px;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `;
 
 const HomePage = ({ LoginData }) => {
@@ -249,7 +262,13 @@ const HomePage = ({ LoginData }) => {
                 )}
 
                 <Footer>
-                    © {new Date().getFullYear()} OrbitDeck. All rights reserved.
+                    &copy; {new Date().getFullYear()} OrbitDeck
+                    {LoginData?.data?.username && (
+                        <>
+                            {" "}
+                            —<FooterLink to="/me">Profile</FooterLink>
+                        </>
+                    )}
                 </Footer>
             </PageWrapper>
         </>
