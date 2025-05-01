@@ -36,7 +36,7 @@ GET http://{{host}}/deployment?pageNo=1
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/7
+GET http://{{host}}/deployment/70
 Content-Type: {{contentType}}
 
 ###

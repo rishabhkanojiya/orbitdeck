@@ -1,0 +1,22 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: orbitdeck-analytics
+  datasource:
+    url: jdbc:postgresql://localhost:5432/logging?sslmode=disable
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: none
+      # ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true

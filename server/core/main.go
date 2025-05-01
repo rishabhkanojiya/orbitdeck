@@ -8,6 +8,7 @@ import (
 	"github.com/rishabhkanojiya/orbitdeck/server/core/api"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	service "github.com/rishabhkanojiya/orbitdeck/server/core/service"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 
@@ -70,8 +71,8 @@ func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store
 	workerType := config.WORKER_TYPE
 
 	helmSvc := service.NewHelmService(filepath.Join("config", "infra", "helm"))
-
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, helmSvc, workerType)
+	eventPublisher := publish.NewRedisEventPublisher(config.REDIS_ADDRESS)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, eventPublisher, helmSvc, workerType)
 
 	log.Info().Msgf("Starting task processor for: %s", workerType)
 
@@ -84,7 +85,10 @@ func runTaskProcessor(config config.Config, redisOpt asynq.RedisClientOpt, store
 }
 
 func runGinServer(config config.Config, store db.Store, taskDistributor worker.TaskDistributor) {
-	server, err := api.NewServer(config, store, taskDistributor)
+
+	eventPublisher := publish.NewRedisEventPublisher(config.REDIS_ADDRESS)
+
+	server, err := api.NewServer(config, store, eventPublisher, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}

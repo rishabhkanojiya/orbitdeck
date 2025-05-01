@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:8090
+
+###
+GET {{baseUrl}}/events/recent
+
+###
+GET {{baseUrl}}/events/stats
+
+###
+GET {{baseUrl}}/events/component/usage
+
+###
+GET {{baseUrl}}/events/timeline
+
+###
+GET {{baseUrl}}/events/errors

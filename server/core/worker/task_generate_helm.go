@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/hibiken/asynq"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	"github.com/rs/zerolog/log"
 )
 
@@ -58,10 +60,33 @@ func (processor *RedisTaskProcessor) ProcessTaskGenerateHelm(ctx context.Context
 
 	err = processor.helmSvc.Deploy(deployment)
 
+	_ = processor.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+		EventType:    "deployment_status_changed",
+		DeploymentID: payload.Id,
+		Status:       "installing",
+		Timestamp:    time.Now().Unix(),
+	})
+
 	if err != nil {
 		_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "failed")
+
+		_ = processor.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+			DeploymentID: payload.Id,
+			Repository:   deployment.Components[0].Image.Repository,
+			Status:       "failed",
+			Timestamp:    time.Now().Unix(),
+		})
+
 		return fmt.Errorf("failed to Deploy: %w", err)
 	}
+
+	_ = processor.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+		EventType:    "deployment_created",
+		DeploymentID: deployment.ID,
+		Status:       "installed",
+		Timestamp:    time.Now().Unix(),
+	})
+
 	_ = processor.store.SetDeploymentStatus(ctx, payload.Id, "installed")
 	if err != nil {
 		return fmt.Errorf("helm succeeded but failed to update status: %w", err)

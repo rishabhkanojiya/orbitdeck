@@ -10,7 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 )
 
@@ -100,6 +102,7 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 	}
 
 	for i, comp := range req.Components {
+
 		params.Components[i] = db.ComponentParams{
 			Name:         comp.Name,
 			ReplicaCount: comp.ReplicaCount,
@@ -136,6 +139,27 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 	}
 
 	deployment, err := server.store.CreateDeploymentTx(ctx, params, AfterCreate)
+
+	for _, comp := range req.Components {
+		_ = server.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+			EventType:    "component_added",
+			DeploymentID: deployment.ID,
+			Component:    comp.Name,
+			Repository:   comp.Image.Repository,
+			Meta:         comp.Resources,
+			Timestamp:    time.Now().Unix(),
+		})
+	}
+	// authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
+
+	_ = server.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+		EventType:    "deployment_created",
+		DeploymentID: deployment.ID,
+		Status:       "pending",
+		// User:         authPayload.Username,
+		Timestamp: time.Now().Unix(),
+	})
+
 	if err != nil {
 		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
 		return
@@ -261,6 +285,13 @@ func (server *Server) UninstallDeployment(c *gin.Context) {
 		asynq.Queue(worker.QueueUninstall),
 	}
 	server.taskDistributor.DistributeTaskUninstallHelm(c, taskPayload, opts...)
+
+	_ = server.publisher.PublishDeploymentEvent(c, publish.EventPayload{
+		EventType:    "uninstall_triggered",
+		DeploymentID: deployment.ID,
+		Status:       "uninstalling",
+		Timestamp:    time.Now().Unix(),
+	})
 
 	c.JSON(http.StatusOK, gin.H{
 		"deployment": deployment,

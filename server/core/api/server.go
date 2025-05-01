@@ -6,6 +6,7 @@ import (
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/util"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
 
@@ -21,11 +22,12 @@ type Server struct {
 	store           db.Store
 	tokenMaker      token.Maker
 	router          *gin.Engine
+	publisher       publish.EventPublisher
 	taskDistributor worker.TaskDistributor
 }
 
 // NewServer creates a new HTTP server and set up routing.
-func NewServer(config config.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
+func NewServer(config config.Config, store db.Store, eventPublisher publish.EventPublisher, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TOKEN_SYMMETRIC_KEY)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
@@ -35,6 +37,7 @@ func NewServer(config config.Config, store db.Store, taskDistributor worker.Task
 		config:          config,
 		store:           store,
 		tokenMaker:      tokenMaker,
+		publisher:       eventPublisher,
 		taskDistributor: taskDistributor,
 	}
 

@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/hibiken/asynq"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	"github.com/rs/zerolog/log"
 )
 
@@ -48,13 +50,19 @@ func (processor *RedisTaskProcessor) ProcessTaskUninstallHelm(ctx context.Contex
 		return err
 	}
 
-	log.Debug().Interface("deployment", deployment).Msg("deployment")
-
 	err = processor.helmSvc.Uninstall(deployment)
 
 	if err != nil {
 		return fmt.Errorf("failed to Uninstall Helm: %w", err)
+
 	}
+
+	_ = processor.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
+		EventType:    "deployment_status_changed",
+		DeploymentID: payload.Id,
+		Status:       "uninstalled",
+		Timestamp:    time.Now().Unix(),
+	})
 
 	err = processor.store.DeleteDeployment(ctx, deployment.ID)
 	if err != nil {

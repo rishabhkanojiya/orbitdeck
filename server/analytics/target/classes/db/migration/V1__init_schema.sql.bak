@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS deployment_events (
+    id SERIAL PRIMARY KEY,
+    deployment_id BIGINT NOT NULL,
+    repository TEXT NOT NULL,
+    status TEXT NOT NULL,
+    timestamp TIMESTAMP NOT NULL
+);

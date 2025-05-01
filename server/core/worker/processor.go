@@ -4,6 +4,7 @@ import (
 	"context"
 
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
+	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	service "github.com/rishabhkanojiya/orbitdeck/server/core/service"
 
 	"github.com/hibiken/asynq"
@@ -25,12 +26,14 @@ type TaskProcessor interface {
 }
 
 type RedisTaskProcessor struct {
-	server  *asynq.Server
-	store   db.Store
-	helmSvc *service.HelmService
+	server    *asynq.Server
+	store     db.Store
+	helmSvc   *service.HelmService
+	publisher publish.EventPublisher
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSvc *service.HelmService, workerType string) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, publisher publish.EventPublisher, helmSvc *service.HelmService, workerType string) TaskProcessor {
+
 	var queueConfig map[string]int
 
 	switch workerType {
@@ -60,9 +63,10 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store, helmSv
 	)
 
 	return &RedisTaskProcessor{
-		server:  server,
-		store:   store,
-		helmSvc: helmSvc,
+		server:    server,
+		store:     store,
+		helmSvc:   helmSvc,
+		publisher: publisher,
 	}
 }
 
