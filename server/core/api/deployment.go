@@ -282,17 +282,31 @@ func (server *Server) GetDeploymentStatus(ctx *gin.Context) {
 	}
 
 	if !deployment.TaskID.Valid {
-		ctx.JSON(errorResponse(http.StatusNotFound, errors.New("no task associated with deployment")))
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "no task ID found"})
 		return
 	}
 
-	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS}) // adjust config
+	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: server.config.REDIS_ADDRESS})
+
 	info, err := inspector.GetTaskInfo(worker.QueueGenerate, deployment.TaskID.String)
 	if err != nil {
-		ctx.JSON(errorResponse(http.StatusInternalServerError, err))
+		ctx.JSON(http.StatusOK, gin.H{"state": "completed"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"state": info.State, // pending, active, succeeded, failed
-	})
+
+	stateEnum := map[int]string{
+		1: "pending",
+		2: "active",
+		3: "scheduled",
+		4: "retry",
+		5: "archived",
+		6: "completed",
+	}
+
+	enumVal := stateEnum[int(info.State)]
+	if enumVal == "" {
+		enumVal = "completed"
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"state": enumVal})
 }

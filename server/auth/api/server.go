@@ -56,12 +56,10 @@ func LogCORSRejections() gin.HandlerFunc {
 			}
 
 			if !isAllowed {
-				// Log the rejected origin
 				log.Printf("CORS request rejected: Origin '%s' is not allowed", origin)
 			}
 		}
 
-		// Continue to the next middleware/handler
 		c.Next()
 	}
 }

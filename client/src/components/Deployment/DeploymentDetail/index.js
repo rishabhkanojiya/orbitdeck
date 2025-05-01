@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import {
-    queueEnums,
-    skillIconUrls,
-    terminalStates,
-} from "../../../common/constants";
+import { skillIconUrls, terminalStates } from "../../../common/constants";
 import { DeploymentService } from "../../../services/deployment.services";
 import FloatingIcons from "../../FloatingIcons";
 import { PrimaryButton } from "../../Button";
@@ -167,14 +163,14 @@ const DeploymentDetail = ({ ShowPopupData }) => {
                 const res = await DeploymentService.getDeploymentStatus({
                     deploymentId: id,
                 });
-                const statusName = queueEnums[res.data.state] || "unknown";
+                const statusName = res.data.state || "unknown";
                 setLiveStatus(statusName);
 
                 if (terminalStates.has(statusName)) {
                     setPolling(false);
 
-                    DeploymentService.getDeployment({ id })
-                        .then((res) => setDeployment(res))
+                    DeploymentService.getDeploymentById({ deploymentId: id })
+                        .then((res) => setDeployment(res.data))
                         .catch((err) =>
                             console.error("Failed to refresh deployment:", err),
                         );
@@ -234,12 +230,12 @@ const DeploymentDetail = ({ ShowPopupData }) => {
                             </StatusBadge>
                         )}
                     </TitleRow>
-
+                    {/*
                     <SubInfo>
                         {polling
                             ? `Live Queue Status: ${liveStatus ?? "loading"}`
                             : `Final Status: ${deployment?.Status}`}
-                    </SubInfo>
+                    </SubInfo> */}
 
                     <Section>
                         <SectionTitle>Helm Release</SectionTitle>

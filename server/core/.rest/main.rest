@@ -44,7 +44,7 @@ DELETE  http://{{host}}/deployment/53
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/53/status
+GET http://{{host}}/deployment/57/status
 
 
 ###

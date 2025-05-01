@@ -4,7 +4,7 @@ export const simpleDeploy = {
     components: [
         {
             name: "user",
-            image: { repository: "rishabh75/orbitdeck-user", tag: "latest" },
+            image: { repository: "rishabh75/sample-node", tag: "latest" },
             replica_count: 1,
             service_port: 9069,
             resources: {
@@ -43,7 +43,7 @@ export const multiDeploy = {
         },
         {
             name: "user",
-            image: { repository: "rishabh75/orbitdeck-user", tag: "latest" },
+            image: { repository: "rishabh75/sample-node", tag: "latest" },
             replica_count: 1,
             service_port: 9069,
             resources: {
