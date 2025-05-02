@@ -6,6 +6,7 @@ export const routesObj = {
     deploymentId: "/deployment/:id",
     deploymentAdd: "/deployment/add",
     me: "/me",
+    analytics: "/analytics",
 };
 
 export const tech = [
@@ -59,3 +60,10 @@ export const queueEnums = {
 };
 
 export const terminalStates = new Set(["retry", "archived", "completed"]);
+
+export const timelineOptions = [
+    { label: "Past Hour (by Minute)", value: "minute" },
+    { label: "Today (by Hour)", value: "hour" },
+    { label: "Last 30 Days", value: "day" },
+    { label: "Last 3 Months (by Week)", value: "week" },
+];

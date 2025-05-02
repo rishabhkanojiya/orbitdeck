@@ -36,9 +36,10 @@ public class EventAnalyticsController {
         return analyticsService.getTopComponents(10);
     }
 
+    // "minute", "hour", "day", "week"
     @GetMapping("/timeline")
-    public List<TimelinePoint> getTimeline() {
-        return analyticsService.getEventTimeline();
+    public List<TimelinePoint> getTimeline(@RequestParam(defaultValue = "hour") String interval) {
+        return analyticsService.getEventTimeline(interval);
     }
 
     @GetMapping("/errors")

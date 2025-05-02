@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS events (
     repository TEXT,
     status TEXT,
     user_email TEXT,
-    meta JSONB,
+    meta TEXT,
     timestamp TIMESTAMP NOT NULL
 );

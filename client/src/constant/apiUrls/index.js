@@ -13,4 +13,10 @@ export const URLS = {
     deployment: `${environment.CORE_API_URL}/${deploymentUrl}/:deploymentId`,
     deploymentAdd: `${environment.CORE_API_URL}/${deploymentUrl}/add`,
     deploymentStatus: `${environment.CORE_API_URL}/${deploymentUrl}/:deploymentId/status`,
+
+    analyticsStats: `${environment.ANALYTICS_API_URL}/events/stats`,
+    analyticsRecent: `${environment.ANALYTICS_API_URL}/events/recent`,
+    analyticsErrors: `${environment.ANALYTICS_API_URL}/events/errors`,
+    analyticsTimeline: `${environment.ANALYTICS_API_URL}/events/timeline`,
+    analyticsComponentUsage: `${environment.ANALYTICS_API_URL}/events/component/usage`,
 };

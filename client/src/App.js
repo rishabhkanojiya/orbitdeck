@@ -6,50 +6,18 @@ import routes from "./Routes";
 import AuthGuard from "./Guard/Auth";
 import { Suspense } from "react";
 
-const darkTheme = createTheme({
-    palette: {
-        mode: "dark",
-    },
-    components: {
-        MuiTextField: {
-            styleOverrides: {
-                root: {
-                    input: {
-                        "&:-webkit-autofill": {
-                            WebkitBoxShadow: "0 0 0 50px #121212 inset",
-                            WebkitTextFillColor: "white",
-                        },
-                    },
-                },
-            },
-        },
-    },
-});
-
 const App = () => {
     return (
-        <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <Router>
-                <Suspense fallback={<></>}>
-                    <Switch>
-                        {routes.map((route, index) => (
-                            <AuthGuard
-                                key={index}
-                                {...route}
-                                // path={route.path}
-                                // component={route.component}
-                                // exact={route.exact}
-                                // forceFetch={route.forceFetch}
-                                // isAuthPage={route?.isAuthPage}
-                                // requiresAuth={route.requiresAuth}
-                            />
-                        ))}
-                        <Redirect to="/" />
-                    </Switch>
-                </Suspense>
-            </Router>
-        </ThemeProvider>
+        <Router>
+            <Suspense fallback={<></>}>
+                <Switch>
+                    {routes.map((route, index) => (
+                        <AuthGuard key={index} {...route} />
+                    ))}
+                    <Redirect to="/" />
+                </Switch>
+            </Suspense>
+        </Router>
     );
 };
 

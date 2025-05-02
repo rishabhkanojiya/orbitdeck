@@ -2,6 +2,8 @@ package com.orbitdeck.repository;
 
 import com.orbitdeck.model.EventLog;
 
+import io.lettuce.core.dynamic.annotation.Param;
+
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +28,11 @@ public interface EventLogRepository extends JpaRepository<EventLog, Long> {
     @Query("SELECT e.component, COUNT(e) FROM EventLog e WHERE e.component IS NOT NULL GROUP BY e.component ORDER BY COUNT(e) DESC")
     List<Object[]> findTopComponents(Pageable pageable);
 
-    @Query("SELECT DATE_TRUNC('day', e.timestamp) AS day, COUNT(e) FROM EventLog e GROUP BY day ORDER BY day ASC")
-    List<Object[]> getEventTimeline();
+    @Query(value = "SELECT DATE_TRUNC(:interval, timestamp) AS time_point, COUNT(*) " +
+            "FROM events " +
+            "GROUP BY time_point " +
+            "ORDER BY time_point", nativeQuery = true)
+    List<Object[]> getEventTimelineByInterval(@Param("interval") String interval);
 
     @Query("SELECT e FROM EventLog e WHERE LOWER(e.status) IN ('failed', 'crashed') ORDER BY e.timestamp DESC")
     List<EventLog> findErrorEvents(Pageable pageable);

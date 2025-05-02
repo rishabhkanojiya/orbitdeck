@@ -36,8 +36,8 @@ public class AnalyticsService {
                 .toList();
     }
 
-    public List<TimelinePoint> getEventTimeline() {
-        return repository.getEventTimeline().stream()
+    public List<TimelinePoint> getEventTimeline(String interval) {
+        return repository.getEventTimelineByInterval(interval).stream()
                 .map(r -> new TimelinePoint(r[0].toString(), (Long) r[1]))
                 .toList();
     }

@@ -10,6 +10,7 @@ const DeploymentForm = React.lazy(() =>
 const DeploymentDetail = React.lazy(() =>
     import("../components/Deployment/DeploymentDetail"),
 );
+const Analytics = React.lazy(() => import("../components/Analytics"));
 
 const routes = [
     {
@@ -43,6 +44,12 @@ const routes = [
     {
         path: routesObj.me,
         component: User,
+        requiresAuth: true,
+        exact: true,
+    },
+    {
+        path: routesObj.analytics,
+        component: Analytics,
         requiresAuth: true,
         exact: true,
     },

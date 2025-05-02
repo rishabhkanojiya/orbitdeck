@@ -53,7 +53,7 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://orbitdeck.app", "http://orbitdeck.app", "http://localhost:3000"},
+		AllowOrigins:     []string{"http://orbitdeck.app", "https://orbitdeck.app", "http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
