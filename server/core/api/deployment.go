@@ -10,7 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
 
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/api"
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/publish"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/worker"
@@ -75,8 +78,12 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 		}
 	}
 
+	authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
+	owner := authPayload.Username
+
 	params := db.DeploymentParams{
 		Name:        req.Name,
+		Owner:       owner,
 		Environment: req.Environment,
 		Components:  make([]db.ComponentParams, len(req.Components)),
 	}
@@ -150,14 +157,13 @@ func (server *Server) CreateDeployment(ctx *gin.Context) {
 			Timestamp:    time.Now().Unix(),
 		})
 	}
-	// authPayload := ctx.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
 
 	_ = server.publisher.PublishDeploymentEvent(ctx, publish.EventPayload{
 		EventType:    "deployment_created",
 		DeploymentID: deployment.ID,
 		Status:       "pending",
-		// User:         authPayload.Username,
-		Timestamp: time.Now().Unix(),
+		User:         authPayload.Username,
+		Timestamp:    time.Now().Unix(),
 	})
 
 	if err != nil {
@@ -211,7 +217,18 @@ func (server *Server) GetDeployment(c *gin.Context) {
 		return
 	}
 
+	authPayload := c.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
+
 	deployment, err := server.store.GetDeploymentObject(c.Request.Context(), int64(id))
+
+	log.Debug().Interface("owner", authPayload.Username).Msg("owner")
+	log.Debug().Interface("owner", deployment.Owner).Msg("dp")
+
+	if deployment.Owner != authPayload.Username {
+		c.JSON(errorResponse(http.StatusForbidden, errors.New("forbidden")))
+		return
+	}
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			c.JSON(errorResponse(http.StatusNotFound, errors.New("deployment not found")))
@@ -225,6 +242,11 @@ func (server *Server) GetDeployment(c *gin.Context) {
 }
 
 func (server *Server) GetDeployments(c *gin.Context) {
+
+	authPayload := c.MustGet(api.AuthorizationPayloadKey).(*token.Payload)
+	owner := authPayload.Username
+
+	log.Debug().Interface("owner", owner).Msg("owner")
 	pageNoStr := c.DefaultQuery("pageNo", "1")
 	pageSizeStr := c.DefaultQuery("pageSize", "10")
 
@@ -239,7 +261,7 @@ func (server *Server) GetDeployments(c *gin.Context) {
 
 	offset := (pageNo - 1) * pageSize
 
-	result, err := server.store.GetPaginatedDeploymentObjects(c.Request.Context(), int32(pageSize), int32(offset))
+	result, err := server.store.GetPaginatedDeploymentObjects(c.Request.Context(), owner, int32(pageSize), int32(offset))
 	if err != nil {
 		c.JSON(errorResponse(http.StatusInternalServerError, err))
 		return

@@ -32,11 +32,15 @@ Content-Type: {{contentType}}
 }
 
 ###
+# @name logout
+POST http://{{authHost}}/users/logout
+
+###
 GET http://{{host}}/deployment?pageNo=1
 Content-Type: {{contentType}}
 
 ###
-GET http://{{host}}/deployment/74
+GET http://{{host}}/deployment/4
 Content-Type: {{contentType}}
 
 ###

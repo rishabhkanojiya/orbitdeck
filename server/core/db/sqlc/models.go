@@ -64,6 +64,7 @@ type Component struct {
 
 type Deployment struct {
 	ID          int64          `json:"id"`
+	Owner       string         `json:"owner"`
 	Name        string         `json:"name"`
 	Environment Environment    `json:"environment"`
 	HelmRelease sql.NullString `json:"helm_release"`

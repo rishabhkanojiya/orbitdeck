@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 
+	"github.com/rishabhkanojiya/orbitdeck/server/auth/api"
 	"github.com/rishabhkanojiya/orbitdeck/server/auth/token"
 	"github.com/rishabhkanojiya/orbitdeck/server/core/config"
 	db "github.com/rishabhkanojiya/orbitdeck/server/core/db/sqlc"
@@ -59,8 +60,8 @@ func (server *Server) setupRouter() {
 		AllowCredentials: true,
 	}))
 
-	// deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
-	deploymentRoutes := router.Group("/deployment")
+	deploymentRoutes := router.Group("/deployment").Use(api.AuthMiddleware(server.tokenMaker))
+
 	deploymentRoutes.GET("", server.GetDeployments)
 	deploymentRoutes.POST("/add", server.CreateDeployment)
 	deploymentRoutes.GET("/:id", server.GetDeployment)

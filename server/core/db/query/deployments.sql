@@ -1,7 +1,9 @@
 -- name: CreateDeployment :one
-INSERT INTO deployments (name, environment, helm_release)
-VALUES ($1, $2, $3)
-RETURNING *;
+INSERT INTO deployments (
+  name, environment, helm_release, owner
+) VALUES (
+  $1, $2, $3, $4
+) RETURNING *;
 
 -- name: CreateComponent :one
 INSERT INTO components (deployment_id, name, replica_count, service_port)
@@ -43,6 +45,12 @@ SELECT key, value FROM env_vars WHERE component_id = $1;
 SELECT * FROM deployments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2;
+
+-- name: ListDeploymentsByOwnerPaginated :many
+SELECT * FROM deployments
+WHERE owner = $1
+ORDER BY created_at DESC
+LIMIT $2 OFFSET $3;
 
 -- name: CountDeployments :one
 SELECT COUNT(*) FROM deployments;

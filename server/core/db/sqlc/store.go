@@ -10,7 +10,7 @@ type Store interface {
 	Querier
 	CreateDeploymentTx(ctx context.Context, params DeploymentParams, AfterCreate func(id int64) (string, error)) (Deployment, error)
 	GetDeploymentObject(ctx context.Context, id int64) (DeploymentParams, error)
-	GetPaginatedDeploymentObjects(ctx context.Context, limit, offset int32) (PaginatedDeploymentsResult, error)
+	GetPaginatedDeploymentObjects(ctx context.Context, owner string, limit, offset int32) (PaginatedDeploymentsResult, error)
 	DeleteDeployment(ctx context.Context, id int64) error
 	SetDeploymentStatus(ctx context.Context, id int64, status string) error
 }

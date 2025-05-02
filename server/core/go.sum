@@ -9,6 +9,8 @@ github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29 h1:1DcvRPZOd
 github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29/go.mod h1:UzH9IX1MMqOcwhoNOIjmTQeAxrFgzs50j4golQtXXxU=
 github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635 h1:52m0LGchQBBVqJRyYYufQuIbVqRawmubW3OFGqK1ekw=
 github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635/go.mod h1:lmLxL+FV291OopO93Bwf9fQLQeLyt33VJRUg5VJ30us=
+github.com/brianvoe/gofakeit/v7 v7.1.2 h1:vSKaVScNhWVpf1rlyEKSvO8zKZfuDtGqoIHT//iNNb8=
+github.com/brianvoe/gofakeit/v7 v7.1.2/go.mod h1:QXuPeBw164PJCzCUZVmgpgHJ3Llj49jSLVkKPMtxtxA=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
@@ -143,8 +145,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
 github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
-github.com/rishabhkanojiya/orbitdeck/server/auth v0.0.0-20250131041847-90d350c02804 h1:A/WrRtHr3zgkJ1aC1EA/TocbcQddzRxMks8h+d/5xtE=
-github.com/rishabhkanojiya/orbitdeck/server/auth v0.0.0-20250131041847-90d350c02804/go.mod h1:DDrtYkVtu9oUFrUFcgMk4QuEsnHAxNOQZpzPlZDrR/E=
+github.com/rishabhkanojiya/orbitdeck/server/auth v0.0.0-20250502002512-77cb8c8fc0eb h1:M4Qsoic510qCDMaUIIJFJRnqJ6+T3OUVl3v2q/SyFV0=
+github.com/rishabhkanojiya/orbitdeck/server/auth v0.0.0-20250502002512-77cb8c8fc0eb/go.mod h1:m1aKNSEX3YGNAAq5+O0Z9yOnhnm2SOGymR9IYZ++NtA=
 github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
 github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=

@@ -8,6 +8,7 @@ import (
 
 type DeploymentParams struct {
 	ID          int64
+	Owner       string
 	Name        string
 	Environment string
 	HelmRelease string
@@ -59,6 +60,7 @@ func (store *SQLStore) CreateDeploymentTx(ctx context.Context, params Deployment
 
 		d, err := q.CreateDeployment(ctx, CreateDeploymentParams{
 			Name:        params.Name,
+			Owner:       params.Owner,
 			Environment: Environment(params.Environment),
 			HelmRelease: sql.NullString{String: generateHelmReleaseName(params.Name, params.Environment), Valid: true},
 		})
@@ -212,6 +214,7 @@ func (store *SQLStore) GetDeploymentObject(ctx context.Context, id int64) (Deplo
 
 	return DeploymentParams{
 		ID:          deployment.ID,
+		Owner:       deployment.Owner,
 		Name:        deployment.Name,
 		Environment: string(deployment.Environment),
 		HelmRelease: deployment.HelmRelease.String,
@@ -232,11 +235,13 @@ type PaginatedDeploymentsResult struct {
 	Total   int64
 }
 
-func (store *SQLStore) GetPaginatedDeploymentObjects(ctx context.Context, limit, offset int32) (PaginatedDeploymentsResult, error) {
-	deployments, err := store.Queries.ListDeploymentsPaginated(ctx, ListDeploymentsPaginatedParams{
+func (store *SQLStore) GetPaginatedDeploymentObjects(ctx context.Context, owner string, limit, offset int32) (PaginatedDeploymentsResult, error) {
+	deployments, err := store.Queries.ListDeploymentsByOwnerPaginated(ctx, ListDeploymentsByOwnerPaginatedParams{
+		Owner:  owner,
 		Limit:  limit,
 		Offset: offset,
 	})
+
 	if err != nil {
 		return PaginatedDeploymentsResult{}, fmt.Errorf("failed to list deployments: %w", err)
 	}

@@ -86,7 +86,7 @@ const Login = ({ ShowPopupData, LoginData }) => {
                         id="username"
                         placeholder="Username"
                         required
-                        value={"rk1"}
+                        // value={"rk1"}
                         {...register("username")}
                     />
                     <Input

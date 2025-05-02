@@ -2,6 +2,7 @@ CREATE TYPE "environment" AS ENUM ('dev', 'staging', 'prod');
 
 CREATE TABLE "deployments" (
     "id" bigserial PRIMARY KEY,
+    "owner" varchar NOT NULL,
     "name" varchar NOT NULL,
     "environment" "environment" NOT NULL DEFAULT 'dev',
     "helm_release" varchar,

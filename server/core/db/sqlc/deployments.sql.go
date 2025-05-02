@@ -53,22 +53,31 @@ func (q *Queries) CreateComponent(ctx context.Context, arg CreateComponentParams
 }
 
 const createDeployment = `-- name: CreateDeployment :one
-INSERT INTO deployments (name, environment, helm_release)
-VALUES ($1, $2, $3)
-RETURNING id, name, environment, helm_release, task_id, status, created_at
+INSERT INTO deployments (
+  name, environment, helm_release, owner
+) VALUES (
+  $1, $2, $3, $4
+) RETURNING id, owner, name, environment, helm_release, task_id, status, created_at
 `
 
 type CreateDeploymentParams struct {
 	Name        string         `json:"name"`
 	Environment Environment    `json:"environment"`
 	HelmRelease sql.NullString `json:"helm_release"`
+	Owner       string         `json:"owner"`
 }
 
 func (q *Queries) CreateDeployment(ctx context.Context, arg CreateDeploymentParams) (Deployment, error) {
-	row := q.db.QueryRowContext(ctx, createDeployment, arg.Name, arg.Environment, arg.HelmRelease)
+	row := q.db.QueryRowContext(ctx, createDeployment,
+		arg.Name,
+		arg.Environment,
+		arg.HelmRelease,
+		arg.Owner,
+	)
 	var i Deployment
 	err := row.Scan(
 		&i.ID,
+		&i.Owner,
 		&i.Name,
 		&i.Environment,
 		&i.HelmRelease,
@@ -204,7 +213,7 @@ func (q *Queries) GetComponentEnvVars(ctx context.Context, componentID int64) ([
 }
 
 const getDeployment = `-- name: GetDeployment :one
-SELECT id, name, environment, helm_release, task_id, status, created_at FROM deployments WHERE id = $1
+SELECT id, owner, name, environment, helm_release, task_id, status, created_at FROM deployments WHERE id = $1
 `
 
 func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, error) {
@@ -212,6 +221,7 @@ func (q *Queries) GetDeployment(ctx context.Context, id int64) (Deployment, erro
 	var i Deployment
 	err := row.Scan(
 		&i.ID,
+		&i.Owner,
 		&i.Name,
 		&i.Environment,
 		&i.HelmRelease,
@@ -280,8 +290,53 @@ func (q *Queries) GetDeploymentComponents(ctx context.Context, deploymentID int6
 	return items, nil
 }
 
+const listDeploymentsByOwnerPaginated = `-- name: ListDeploymentsByOwnerPaginated :many
+SELECT id, owner, name, environment, helm_release, task_id, status, created_at FROM deployments
+WHERE owner = $1
+ORDER BY created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListDeploymentsByOwnerPaginatedParams struct {
+	Owner  string `json:"owner"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
+}
+
+func (q *Queries) ListDeploymentsByOwnerPaginated(ctx context.Context, arg ListDeploymentsByOwnerPaginatedParams) ([]Deployment, error) {
+	rows, err := q.db.QueryContext(ctx, listDeploymentsByOwnerPaginated, arg.Owner, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Deployment{}
+	for rows.Next() {
+		var i Deployment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Owner,
+			&i.Name,
+			&i.Environment,
+			&i.HelmRelease,
+			&i.TaskID,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listDeploymentsPaginated = `-- name: ListDeploymentsPaginated :many
-SELECT id, name, environment, helm_release, task_id, status, created_at FROM deployments
+SELECT id, owner, name, environment, helm_release, task_id, status, created_at FROM deployments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -302,6 +357,7 @@ func (q *Queries) ListDeploymentsPaginated(ctx context.Context, arg ListDeployme
 		var i Deployment
 		if err := rows.Scan(
 			&i.ID,
+			&i.Owner,
 			&i.Name,
 			&i.Environment,
 			&i.HelmRelease,
