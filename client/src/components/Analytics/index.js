@@ -19,6 +19,7 @@ import { LoginContext } from "../../context";
 import { DeploymentService } from "../../services/deployment.services";
 import { AnalyticsService } from "../../services/analytics.service";
 import { timelineOptions } from "../../common/constants";
+import { format } from "date-fns";
 
 ChartJS.register(
     CategoryScale,
@@ -202,7 +203,13 @@ const AnalyticsPage = ({ LoginData }) => {
         },
     };
 
-    const formatDate = (ts) => new Date(ts).toLocaleString();
+    const formatDate = (iso) => {
+        try {
+            return format(new Date(iso), "MMM dd, yyyy • HH:mm");
+        } catch {
+            return "";
+        }
+    };
 
     return (
         <PageWrapper>

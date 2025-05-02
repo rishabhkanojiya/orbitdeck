@@ -117,7 +117,7 @@ const Navbar = ({ fwdRef, LoginData }) => {
     const { data: userObj, setUserObj } = LoginData;
 
     const handleLogout = async () => {
-        await AuthService.logout(); // if needed
+        await AuthService.logout();
         setUserObj(null);
         history.push("/home");
     };

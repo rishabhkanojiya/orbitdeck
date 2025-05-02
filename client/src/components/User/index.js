@@ -53,7 +53,7 @@ const ProfilePage = ({ LoginData }) => {
 
     const logout = async () => {
         try {
-            await AuthService.logout(); // if needed
+            await AuthService.logout();
             LoginData.setUserObj(null);
             history.push("/auth/login");
         } catch (err) {
@@ -88,7 +88,6 @@ const ProfilePage = ({ LoginData }) => {
                         </InfoLine>
                     )}
 
-                    {/* Optional: show deployment stats */}
                     {user.deployments_count && (
                         <InfoLine>
                             <span>Deployments:</span> {user.deployments_count}

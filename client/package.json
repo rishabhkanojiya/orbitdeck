@@ -13,12 +13,6 @@
     "version": "1.0.1",
     "description": "Webpack 6 boilerplate with React 17, using babel, sass, with HMR and an optimized production build",
     "dependencies": {
-        "@emotion/react": "^11.11.0",
-        "@emotion/styled": "^11.11.0",
-        "@fontsource/roboto": "^5.0.2",
-        "@mui/icons-material": "^5.11.16",
-        "@mui/material": "^5.13.3",
-        "@testing-library/dom": "^9.3.4",
         "axios": "^1.4.0",
         "chart.js": "^4.4.9",
         "connect-history-api-fallback": "^2.0.0",

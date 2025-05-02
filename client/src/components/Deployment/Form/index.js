@@ -198,7 +198,6 @@ const DeploymentForm = ({ ShowPopupData }) => {
             </div>
 
             <PageWrapper>
-                {/* Background Blobs */}
                 <BackgroundBlob style={{ top: "150px", left: "10%" }} />
                 <BackgroundBlob style={{ top: "600px", right: "15%" }} />
 

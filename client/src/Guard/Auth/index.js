@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { Route, useHistory } from "react-router-dom";
 import Loader from "../../components/Loader";
@@ -54,9 +53,7 @@ const AuthGuard = ({
                 LoginData?.data?.username ? (
                     <>
                         <Navbar fwdRef={navHeightref} />
-                        <Box sx={{ paddingBottom: `56px` }}>
-                            <Component {...props} />
-                        </Box>
+                        <Component {...props} />
                     </>
                 ) : (
                     <Component {...props} />

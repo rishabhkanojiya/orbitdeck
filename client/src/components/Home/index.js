@@ -212,10 +212,8 @@ const HomePage = ({ LoginData }) => {
                     )}
                 </HeroSection>
 
-                {/* Logged-in: Deployments Section */}
                 {isLoggedIn && <Dashboard />}
 
-                {/* Logged-out: Features Section */}
                 <FeaturesSection>
                     <FeatureCard>
                         <FeatureTitle>One-Click Deployments</FeatureTitle>
