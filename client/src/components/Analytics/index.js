@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
 import { Bar } from "react-chartjs-2";
 import {
@@ -10,12 +10,15 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+
 import { BackgroundBlob } from "../UiComponents";
+import { CustomDropdown } from "../CustomDropdown";
+import { Consume } from "../../context/Consumer";
+import { LoginContext } from "../../context";
 
 import { DeploymentService } from "../../services/deployment.services";
 import { AnalyticsService } from "../../services/analytics.service";
 import { timelineOptions } from "../../common/constants";
-import { CustomDropdown } from "../CustomDropdown";
 
 ChartJS.register(
     CategoryScale,
@@ -61,11 +64,10 @@ const EventSectionCard = styled(Card)`
     padding: 16px 24px;
     max-height: 300px;
     overflow-y: auto;
-    position: relative;
 
     ul {
         list-style: none;
-        padding-left: 0;
+        padding: 0;
         margin: 0;
     }
 
@@ -76,7 +78,6 @@ const EventSectionCard = styled(Card)`
         border-left: 4px solid #8a2be2;
         border-radius: 8px;
         font-size: 14px;
-        transition: background 0.3s ease;
 
         &:hover {
             background: rgba(255, 255, 255, 0.07);
@@ -110,73 +111,79 @@ const EventSectionCard = styled(Card)`
     }
 `;
 
-const AnalyticsPage = () => {
-    const [activeCount, setActiveCount] = useState(0);
-    const [totalCount, setTotalCount] = useState(0);
-    const [topRepos, setTopRepos] = useState([]);
-    const [topComponents, setTopComponents] = useState([]);
-    const [recentEvents, setRecentEvents] = useState([]);
-    const [errors, setErrors] = useState([]);
+const AnalyticsPage = ({ LoginData }) => {
+    const userEmail = LoginData?.data?.username;
+
+    const [deployments, setDeployments] = useState({ active: 0, total: 0 });
+    const [stats, setStats] = useState({ repos: [], components: [] });
+    const [events, setEvents] = useState({ recent: [], errors: [] });
     const [timeline, setTimeline] = useState([]);
     const [selectedTimeline, setSelectedTimeline] = useState(
         timelineOptions[2],
     );
 
-    const fetchDeployments = async () => {
-        const res = await DeploymentService.getMyDeployments({});
-        const items = res.data.items || [];
-        setTotalCount(items.length);
-        setActiveCount(items.filter((d) => d.status === "installed").length);
-    };
+    const fetchData = useCallback(async () => {
+        const [depRes, statsRes, compRes, eventsRes, errRes] =
+            await Promise.all([
+                DeploymentService.getMyDeployments({}),
+                AnalyticsService.getStats({ userEmail }),
+                AnalyticsService.getTopComponents({ userEmail }),
+                AnalyticsService.getRecentEvents({ userEmail }),
+                AnalyticsService.getErrorEvents({ userEmail }),
+            ]);
 
-    const fetchStats = async () => {
-        const res = await AnalyticsService.getStats();
-        setTopRepos(res.data.topRepos || []);
-    };
+        const deployments = depRes.data.items || [];
+        setDeployments({
+            total: deployments.length,
+            active: deployments.filter((d) => d.status === "installed").length,
+        });
 
-    const fetchTopComponents = async () => {
-        const res = await AnalyticsService.getTopComponents();
-        setTopComponents(res.data || []);
-    };
+        setStats({
+            repos: statsRes.data.topRepos || [],
+            components: compRes.data || [],
+        });
 
-    const fetchRecentEvents = async () => {
-        const res = await AnalyticsService.getRecentEvents();
-        setRecentEvents(res.data || []);
-    };
+        setEvents({
+            recent: eventsRes.data || [],
+            errors: errRes.data || [],
+        });
+    }, [userEmail]);
 
-    const fetchErrors = async () => {
-        const res = await AnalyticsService.getErrorEvents();
-        setErrors(res.data || []);
-    };
-
-    const fetchTimeline = async (range = selectedTimeline.value) => {
+    const fetchTimeline = useCallback(async () => {
         const res = await AnalyticsService.getEventTimeline({
-            interval: range,
+            userEmail,
+            interval: selectedTimeline.value,
         });
         setTimeline(res.data || []);
-    };
+    }, [selectedTimeline]);
 
     useEffect(() => {
-        fetchDeployments();
-        fetchStats();
-        fetchTopComponents();
-        fetchRecentEvents();
-        fetchErrors();
-        fetchTimeline(selectedTimeline.value); // 👈 Pass the current range
+        fetchData();
+        fetchTimeline();
 
         const interval = setInterval(() => {
-            fetchDeployments();
-            fetchErrors();
+            DeploymentService.getMyDeployments({}).then((res) => {
+                const deployments = res.data.items || [];
+                setDeployments({
+                    total: deployments.length,
+                    active: deployments.filter((d) => d.status === "installed")
+                        .length,
+                });
+            });
+
+            AnalyticsService.getErrorEvents({ userEmail }).then((res) => {
+                setEvents((prev) => ({ ...prev, errors: res.data || [] }));
+            });
         }, 10000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchData, fetchTimeline]);
 
     useEffect(() => {
-        fetchTimeline(selectedTimeline.value);
-    }, [selectedTimeline]);
+        fetchTimeline();
+    }, [selectedTimeline, fetchTimeline]);
 
-    const timelineChartData = {
+    const chartData = {
         labels: timeline.map((point) => point.day),
         datasets: [
             {
@@ -187,7 +194,7 @@ const AnalyticsPage = () => {
         ],
     };
 
-    const timelineChartOptions = {
+    const chartOptions = {
         responsive: true,
         plugins: {
             legend: { display: false },
@@ -207,15 +214,15 @@ const AnalyticsPage = () => {
             <SectionGrid>
                 <Card>
                     <Header>📦 Active Deployments</Header>
-                    <p>{activeCount}</p>
+                    <p>{deployments.active}</p>
                 </Card>
                 <Card>
                     <Header>📊 Total Deployments</Header>
-                    <p>{totalCount}</p>
+                    <p>{deployments.total}</p>
                 </Card>
                 <Card>
                     <Header>🔥 Recent Errors</Header>
-                    <p>{errors.length}</p>
+                    <p>{events.errors.length}</p>
                 </Card>
             </SectionGrid>
 
@@ -226,17 +233,16 @@ const AnalyticsPage = () => {
                     selected={selectedTimeline}
                     onSelect={setSelectedTimeline}
                 />
-
-                <Bar data={timelineChartData} options={timelineChartOptions} />
+                <Bar data={chartData} options={chartOptions} />
             </Section>
 
             <SectionGrid>
                 <Card>
                     <Header>🏆 Top Repositories</Header>
                     <ul>
-                        {topRepos.map((repo, idx) => (
-                            <li key={idx}>
-                                {repo.name} — {repo.count}
+                        {stats.repos.map((r, i) => (
+                            <li key={i}>
+                                {r.name} — {r.count}
                             </li>
                         ))}
                     </ul>
@@ -244,8 +250,8 @@ const AnalyticsPage = () => {
                 <Card>
                     <Header>🧱 Top Components</Header>
                     <ul>
-                        {topComponents.map((c, idx) => (
-                            <li key={idx}>
+                        {stats.components.map((c, i) => (
+                            <li key={i}>
                                 {c.component} — {c.count}
                             </li>
                         ))}
@@ -257,7 +263,7 @@ const AnalyticsPage = () => {
                 <Header>📜 Recent Events</Header>
                 <EventSectionCard>
                     <ul>
-                        {recentEvents.map((e) => (
+                        {events.recent.map((e) => (
                             <li key={e.id}>
                                 <span className="event-type">
                                     {e.eventType}
@@ -270,12 +276,12 @@ const AnalyticsPage = () => {
                 </EventSectionCard>
             </Section>
 
-            <Section>
-                <Header>❌ Error Events (Live)</Header>
-                {errors?.length ? (
+            {events.errors.length > 0 && (
+                <Section>
+                    <Header>❌ Error Events (Live)</Header>
                     <EventSectionCard>
                         <ul>
-                            {errors?.map((e) => (
+                            {events.errors.map((e) => (
                                 <li key={e.id}>
                                     <span className="event-type error-status">
                                         {e.status}
@@ -286,12 +292,10 @@ const AnalyticsPage = () => {
                             ))}
                         </ul>
                     </EventSectionCard>
-                ) : (
-                    <></>
-                )}
-            </Section>
+                </Section>
+            )}
         </PageWrapper>
     );
 };
 
-export default AnalyticsPage;
+export default Consume(AnalyticsPage, [LoginContext]);

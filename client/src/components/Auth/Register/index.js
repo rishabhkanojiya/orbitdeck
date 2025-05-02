@@ -77,7 +77,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
     const onSubmit = (data) => {
         AuthService.register(data)
             .then((result) => {
-                LoginData.setUserObj(result);
+                LoginData.setUserObj(result.data.user);
                 history.push("/login");
             })
             .catch((err) => {

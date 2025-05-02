@@ -53,7 +53,7 @@ const AuthGuard = ({
             render={(props) =>
                 LoginData?.data?.username ? (
                     <>
-                        {/* <Navbar fwdRef={navHeightref} /> */}
+                        <Navbar fwdRef={navHeightref} />
                         <Box sx={{ paddingBottom: `56px` }}>
                             <Component {...props} />
                         </Box>

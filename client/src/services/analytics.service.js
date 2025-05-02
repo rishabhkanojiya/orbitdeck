@@ -2,16 +2,19 @@ import { URLS } from "../constant/apiUrls";
 import ApiService from "./api.service";
 
 export const AnalyticsService = {
-    getStats() {
-        return ApiService.get(URLS.analyticsStats);
+    getStats(formData) {
+        const axiosOptions = { params: formData };
+        return ApiService.get(URLS.analyticsStats, axiosOptions);
     },
 
-    getRecentEvents() {
-        return ApiService.get(URLS.analyticsRecent);
+    getRecentEvents(formData) {
+        const axiosOptions = { params: formData };
+        return ApiService.get(URLS.analyticsRecent, axiosOptions);
     },
 
-    getErrorEvents() {
-        return ApiService.get(URLS.analyticsErrors);
+    getErrorEvents(formData) {
+        const axiosOptions = { params: formData };
+        return ApiService.get(URLS.analyticsErrors, axiosOptions);
     },
 
     getEventTimeline(formData) {
@@ -19,7 +22,8 @@ export const AnalyticsService = {
         return ApiService.get(URLS.analyticsTimeline, axiosOptions);
     },
 
-    getTopComponents() {
-        return ApiService.get(URLS.analyticsComponentUsage);
+    getTopComponents(formData) {
+        const axiosOptions = { params: formData };
+        return ApiService.get(URLS.analyticsComponentUsage, axiosOptions);
     },
 };

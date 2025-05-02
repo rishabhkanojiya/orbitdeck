@@ -41,8 +41,8 @@ public class EventLoggingService {
         repository.save(log);
     }
 
-    public List<EventLog> getRecentEvents(int limit) {
-        return repository.findRecent(limit);
+    public List<EventLog> getRecentEvents(String userEmail, int limit) {
+        return repository.findRecentByUserEmail(userEmail, limit);
     }
 
 }

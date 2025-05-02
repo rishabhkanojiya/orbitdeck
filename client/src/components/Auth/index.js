@@ -8,8 +8,6 @@ import {
 } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
-import ForgotPassword from "./ForgotPassword";
-import ResetPassword from "./ResetPassword";
 import { Consume } from "../../context/Consumer";
 import { LoginContext } from "../../context";
 import { routesObj } from "../../common/constants";
@@ -32,14 +30,6 @@ const Auth = ({ LoginData }) => {
         {
             path: `${path}/register`,
             component: Register,
-        },
-        {
-            path: `${path}/forgot-password`,
-            component: ForgotPassword,
-        },
-        {
-            path: `${path}/reset-password/:token`,
-            component: ResetPassword,
         },
     ];
     return (

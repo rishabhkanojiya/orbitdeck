@@ -22,29 +22,30 @@ public class EventAnalyticsController {
     private AnalyticsService analyticsService;
 
     @GetMapping("/recent")
-    public List<EventLog> getRecentEvents() {
-        return eventLoggingService.getRecentEvents(20);
+    public List<EventLog> getRecentEvents(@RequestParam String userEmail) {
+        return eventLoggingService.getRecentEvents(userEmail, 20);
     }
 
     @GetMapping("/stats")
-    public AnalyticsSummary getStats() {
-        return analyticsService.getSummary();
+    public AnalyticsSummary getStats(@RequestParam String userEmail) {
+        return analyticsService.getSummaryForUser(userEmail);
     }
 
     @GetMapping("/component/usage")
-    public List<ComponentUsage> getComponentUsage() {
-        return analyticsService.getTopComponents(10);
+    public List<ComponentUsage> getComponentUsage(@RequestParam String userEmail) {
+        return analyticsService.getTopComponentsForUser(userEmail, 10);
     }
 
     // "minute", "hour", "day", "week"
     @GetMapping("/timeline")
-    public List<TimelinePoint> getTimeline(@RequestParam(defaultValue = "hour") String interval) {
-        return analyticsService.getEventTimeline(interval);
+    public List<TimelinePoint> getTimeline(@RequestParam String userEmail,
+            @RequestParam(defaultValue = "hour") String interval) {
+        return analyticsService.getTimelineForUser(userEmail, interval);
     }
 
     @GetMapping("/errors")
-    public List<EventLog> getErrors() {
-        return analyticsService.getRecentErrors(20);
+    public List<EventLog> getErrors(@RequestParam String userEmail) {
+        return analyticsService.getErrorEventsForUser(userEmail, 20);
     }
 
 }
