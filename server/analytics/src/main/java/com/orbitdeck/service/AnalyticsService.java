@@ -39,7 +39,7 @@ public class AnalyticsService {
     }
 
     public List<TimelinePoint> getTimelineForUser(String userEmail, String interval) {
-        return eventLogRepository.getEventTimelineByUserAndInterval("day", userEmail).stream()
+        return eventLogRepository.getEventTimelineByUserAndInterval(interval, userEmail).stream()
                 .map(r -> new TimelinePoint(r[0].toString(), (Long) r[1]))
                 .toList();
     }

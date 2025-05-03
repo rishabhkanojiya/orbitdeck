@@ -78,7 +78,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
         AuthService.register(data)
             .then((result) => {
                 LoginData.setUserObj(result.data.user);
-                history.push("/login");
+                history.push("/auth/login");
             })
             .catch((err) => {
                 ShowPopupData.setPopupMessageObj(err.response.data, "error");
@@ -111,6 +111,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
                         id="full_name"
                         placeholder="Full Name"
                         required
+                        value={"Rishabh Kanojiya"}
                         {...register("full_name")}
                     />
 
@@ -118,6 +119,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
                         id="username"
                         placeholder="Username"
                         required
+                        value={"rk1"}
                         {...register("username")}
                     />
                     <Input
@@ -125,6 +127,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
                         type="email"
                         placeholder="Email"
                         required
+                        value={"rishabhkanojiya75@gmail.com"}
                         {...register("email")}
                     />
                     <Input
@@ -132,6 +135,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
                         type="password"
                         placeholder="Password"
                         required
+                        value={"Qwe@123456"}
                         {...register("password")}
                     />
                     <Input
@@ -139,6 +143,7 @@ const Register = ({ ShowPopupData, LoginData }) => {
                         type="password"
                         placeholder="Confirm Password"
                         required
+                        value={"Qwe@123456"}
                         {...register(
                             "confirmPassword",
                             passwordMatchValidation,

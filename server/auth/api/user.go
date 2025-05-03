@@ -41,7 +41,6 @@ func newUserResponse(user db.User) userResponse {
 	}
 }
 
-// Helper function to set token-related cookies
 func (server *Server) setTokenCookies(
 	ctx *gin.Context,
 	accessToken string,
@@ -52,9 +51,8 @@ func (server *Server) setTokenCookies(
 ) {
 	const cookiePath = "/"
 	const httpOnly = true
-	const secure = false // set to true if you are using HTTPS
+	const secure = false
 
-	// Set Access Token Cookie
 	ctx.SetCookie(
 		"access_token",
 		accessToken,
@@ -69,7 +67,6 @@ func (server *Server) setTokenCookies(
 		cookiePath, "", secure, httpOnly,
 	)
 
-	// Set Refresh Token Cookie
 	ctx.SetCookie(
 		"refresh_token",
 		refreshToken,
@@ -84,7 +81,6 @@ func (server *Server) setTokenCookies(
 		cookiePath, "", secure, httpOnly,
 	)
 
-	// Set Session ID Cookie
 	ctx.SetCookie(
 		"session_id",
 		sessionID.String(),

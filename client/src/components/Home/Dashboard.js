@@ -177,10 +177,10 @@ const Dashboard = () => {
                 Service={fetchDeployments}
             >
                 {({ items }) =>
-                    items.length ? (
+                    items?.length ? (
                         <>
                             <Grid>
-                                {items.map((d) => (
+                                {items?.map((d) => (
                                     <Link
                                         to={`/deployment/${d.ID}`}
                                         style={{

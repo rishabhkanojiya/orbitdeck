@@ -1,10 +1,14 @@
 server:
-  port: 8090
+  port: ${SERVER_PORT:9069}
 spring:
+  data:
+    redis:
+      url: ${REDIS_ADDRESS_SPRING:redis://localhost:6379}
   application:
     name: orbitdeck-analytics
   datasource:
-    url: jdbc:postgresql://localhost:5432/logging?sslmode=disable
+    # url: ${ANALYTICS_POSTGRES_BILL_SPLIT_READ_WRITE:jdbc:postgresql://localhost:5432/analytics?sslmode=disable}
+    url: jdbc:postgresql://analytics-postgres-svc:5432/analytics
     username: root
     password: root
   jpa:

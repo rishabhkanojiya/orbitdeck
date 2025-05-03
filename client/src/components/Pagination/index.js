@@ -17,7 +17,7 @@ const Pagination = ({ data, Service, children }) => {
             });
             const { items: newItems, page } = response.data;
 
-            setItems((prevItems) => [...prevItems, ...newItems]);
+            setItems((prevItems) => [...prevItems, ...(newItems ?? [])]);
             setHasNextPage(page.hasNext);
         } catch (err) {
             console.error("Pagination fetch failed:", err);

@@ -20,12 +20,13 @@ public class DeploymentEventSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             String json = new String(message.getBody());
+            System.out.println("Received Redis Event: " + json);
+
             EventPayload event = objectMapper.readValue(json, EventPayload.class);
 
-            // Save to DB
             eventLoggingService.log(event);
         } catch (Exception e) {
-            System.err.println("Failed to process event: " + e.getMessage());
+            System.err.println("❌ Failed to process event: " + e.getMessage());
         }
     }
 }

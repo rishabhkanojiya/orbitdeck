@@ -47,6 +47,30 @@ COMPONENT_DEFINITION:
       path: /var/lib/postgresql/data
       subPath: core-postgres
       claimName: core-postgres-pvc
+  - &ANALYTICS-POSTGRES
+    name: analytics-postgres
+    replicaCount: 1
+    image:
+      repository: postgres:14.10-alpine3.19
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      name: "db"
+      port: 5432
+    env:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: "analytics"
+    volume:
+      path: /var/lib/postgresql/data
+      subPath: analytics-postgres
+      claimName: analytics-postgres-pvc
   - &EMAIL-REDIS
     name: email-redis
     replicaCount: 1
@@ -99,6 +123,24 @@ COMPONENT_DEFINITION:
     env:
       SERVER_PORT: 9069
       MODE: server
+  - &ANALYTICS
+    name: analytics
+    replicaCount: 1
+    image:
+      repository: rishabh75/orbitdeck-analytics
+      tag: latest
+    resources:
+      requests:
+        cpu: "1"
+        memory: "500Mi"
+      limits:
+        cpu: "1"
+        memory: "500Mi"
+    service:
+      port: 9069
+    env:
+      SERVER_PORT: 9069
+      SPRING_PROFILES_ACTIVE: prod
   - &EMAIL
     name: email
     replicaCount: 1
@@ -189,6 +231,11 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
             backend:
               serviceName: core-svc
               servicePort: 9069
+          - path: /api/analytics/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: analytics-svc
+              servicePort: 9069
           - path: /?(.*)
             pathType: ImplementationSpecific
             backend:
@@ -220,6 +267,8 @@ volumes:
     storage: 500Mi
   - name: core-postgres
     storage: 500Mi
+  - name: analytics-postgres
+    storage: 500Mi
 
 # cronJobs:
 #   - name: email-cron-job
@@ -239,12 +288,14 @@ volumes:
 DEV_COMPONENTS: &DEV_COMPONENTS
   - *AUTH-POSTGRES
   - *CORE-POSTGRES
+  - *ANALYTICS-POSTGRES
   - *EMAIL-REDIS
   - *AUTH
   - *CORE
+  - *ANALYTICS
   # - *EMAIL
-  # - *GENERATOR
-  # - *UNINSTALLER
+  - *GENERATOR
+  - *UNINSTALLER
   - *CLIENT
 
 components: *DEV_COMPONENTS

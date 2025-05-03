@@ -1,16 +1,17 @@
-@baseUrl = http://localhost:8090
+@baseUrl = https://orbitdeck.app/api/analytics
+# @baseUrl = http://localhost:8090
 
 ###
-GET {{baseUrl}}/events/recent
+GET {{baseUrl}}/events/recent?userEmail=rk1
 
 ###
-GET {{baseUrl}}/events/stats
+GET {{baseUrl}}/events/stats?userEmail=rk1
 
 ###
-GET {{baseUrl}}/events/component/usage
+GET {{baseUrl}}/events/component/usage?userEmail=rk1
 
 ###
-GET {{baseUrl}}/events/timeline
+GET {{baseUrl}}/events/timeline?userEmail=rk1
 
 ###
-GET {{baseUrl}}/events/errors
+GET {{baseUrl}}/events/errors?userEmail=rk1

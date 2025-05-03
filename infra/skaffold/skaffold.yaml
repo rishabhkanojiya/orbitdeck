@@ -21,6 +21,15 @@ kind: Config
             dest: .
       docker:
         dockerfile: ../../server/core/Dockerfile
+    - &ANALYTICS
+      image: rishabh75/orbitdeck-analytics
+      context: ../../server/analytics
+      sync:
+        manual:
+          - src: /**/*.go
+            dest: .
+      docker:
+        dockerfile: ../../server/analytics/Dockerfile
     - &EMAIL
       image: rishabh75/orbitdeck-email
       context: ../../server/auth
@@ -80,9 +89,10 @@ kind: Config
     DEV_ARTIFACTS: &DEV_ARTIFACTS # - *MIGRATE
       - *AUTH
       - *CORE
+      - *ANALYTICS
       # - *EMAIL
-      # - *GENERATOR
-      # - *UNINSTALLER
+      - *GENERATOR
+      - *UNINSTALLER
       - *CLIENT
     PROD_ARTIFACTS: &PROD_ARTIFACTS # - *MIGRATE
       - *AUTH
