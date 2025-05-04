@@ -139,7 +139,7 @@ Content-Type: {{contentType}}
     {
       "name": "user",
       "image": {
-        "repository": "rishabh75/orbitdeck-user",
+        "repository": "rishabh75/templateapp-user",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -168,7 +168,7 @@ Content-Type: {{contentType}}
     {
       "name": "client",
       "image": {
-        "repository": "rishabh75/orbitdeck-client",
+        "repository": "rishabh75/templateapp-client",
         "tag": "latest"
       },
       "replica_count": 1,
@@ -200,7 +200,7 @@ Content-Type: {{contentType}}
     }
   ],
   "ingress": {
-        "host": "orbitdeck.app"
+        "host": "test.orbitdeck.app"
   }
 }
 

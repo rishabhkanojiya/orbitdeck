@@ -73,6 +73,7 @@ const AddButton = styled.button`
     padding: 10px 20px;
     font-weight: 600;
     margin-top: 20px;
+    margin-bottom: 10px;
     border-radius: 8px;
     cursor: pointer;
     position: relative;
@@ -120,6 +121,15 @@ const TestButton = styled.button`
         background: ${({ theme }) => theme.colors.primaryHover};
         box-shadow: 0 0 10px ${({ theme }) => theme.colors.primaryHover};
     }
+`;
+
+const TwoColumn = styled.div`
+    display: flex;
+    gap: 16px;
+`;
+
+const Column = styled.div`
+    flex: 1;
 `;
 
 const repositories = [
@@ -244,13 +254,51 @@ const DeploymentForm = ({ ShowPopupData }) => {
                                     requests: { cpu: "100m", memory: "128Mi" },
                                     limits: { cpu: "500m", memory: "512Mi" },
                                 },
-                                env: [],
+                                env: [{ key: "", value: "" }],
                             });
                             setSelectedRepo((prev) => [...prev, {}]);
                         }}
                     >
                         + Add Another Component
                     </AddButton>
+
+                    <h3>Ingress Configuration</h3>
+                    <TwoColumn>
+                        <Column>
+                            <Label>Ingress Host</Label>
+                            <Input
+                                {...register("ingress.host", {
+                                    required: true,
+                                })}
+                                placeholder="e.g. orbitdeck.app"
+                            />
+                        </Column>
+                        <Column>
+                            <Label>Ingress Path</Label>
+                            <Input
+                                {...register("ingress.path")}
+                                placeholder="e.g. /api/user/?(.*)"
+                            />
+                        </Column>
+                    </TwoColumn>
+
+                    <TwoColumn>
+                        <Column>
+                            <Label>Service Name</Label>
+                            <Input
+                                {...register("ingress.serviceName")}
+                                placeholder="e.g. user-svc"
+                            />
+                        </Column>
+                        <Column>
+                            <Label>Service Port</Label>
+                            <Input
+                                type="number"
+                                {...register("ingress.servicePort")}
+                                placeholder="e.g. 9069"
+                            />
+                        </Column>
+                    </TwoColumn>
 
                     <br />
                     <SubmitButton type="submit">🚀 Deploy Now</SubmitButton>

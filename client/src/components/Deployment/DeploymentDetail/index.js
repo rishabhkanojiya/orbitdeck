@@ -92,6 +92,7 @@ const CodeBox = styled.pre`
     border-radius: 8px;
     font-size: 14px;
     overflow-x: auto;
+    margin-bottom: 10px;
 `;
 
 const LogoStack = styled.div`

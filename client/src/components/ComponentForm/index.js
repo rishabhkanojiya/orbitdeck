@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { CustomDropdown } from "../CustomDropdown";
 import { PrimaryButton } from "../Button";
+import { useFieldArray } from "react-hook-form";
 
 const Section = styled.div`
     margin-bottom: 32px;
@@ -36,15 +37,50 @@ const Column = styled.div`
     flex: 1;
 `;
 
+const AddButton = styled.button`
+    background: transparent;
+    border: 2px dashed ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+    padding: 10px 20px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &:hover {
+        border-color: transparent;
+        box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary};
+    }
+`;
+
+const ThreeColumn = styled.div`
+    display: flex;
+    gap: 16px;
+    align-items: center;
+`;
+
 export const ComponentForm = ({
     register,
     setValue,
     idx,
+    control,
     repositories,
     selectedRepo,
     setSelectedRepo,
     remove,
 }) => {
+    const {
+        fields: envFields,
+        append: appendEnv,
+        remove: removeEnv,
+    } = useFieldArray({
+        control,
+        name: `components.${idx}.env`,
+    });
+
     return (
         <Section>
             <h3>Component {idx + 1}</h3>
@@ -157,6 +193,46 @@ export const ComponentForm = ({
                     />
                 </Column>
             </TwoColumn>
+
+            <h4>Environment Variables</h4>
+            {envFields.map((envField, envIdx) => (
+                <ThreeColumn key={envField.id}>
+                    <Column>
+                        <Label>Key</Label>
+                        <Input
+                            {...register(
+                                `components.${idx}.env.${envIdx}.key`,
+                                { required: true },
+                            )}
+                            placeholder="e.g., DB_HOST"
+                        />
+                    </Column>
+                    <Column>
+                        <Label>Value</Label>
+                        <Input
+                            {...register(
+                                `components.${idx}.env.${envIdx}.value`,
+                                { required: true },
+                            )}
+                            placeholder="e.g., localhost"
+                        />
+                    </Column>
+                    <AddButton
+                        style={{ height: "40px" }}
+                        type="button"
+                        onClick={() => removeEnv(envIdx)}
+                    >
+                        Remove
+                    </AddButton>
+                </ThreeColumn>
+            ))}
+
+            <AddButton
+                type="button"
+                onClick={() => appendEnv({ key: "", value: "" })}
+            >
+                + Add Env Var
+            </AddButton>
 
             <PrimaryButton type="button" onClick={() => remove(idx)}>
                 Remove Component

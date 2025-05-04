@@ -43,7 +43,7 @@ export const multiDeploy = {
         },
         {
             name: "user",
-            image: { repository: "rishabh75/sample-node", tag: "latest" },
+            image: { repository: "rishabh75/templateapp-user", tag: "latest" },
             replica_count: 1,
             service_port: 9069,
             resources: {
@@ -57,7 +57,10 @@ export const multiDeploy = {
         },
         {
             name: "client",
-            image: { repository: "rishabh75/orbitdeck-client", tag: "latest" },
+            image: {
+                repository: "rishabh75/templateapp-client",
+                tag: "latest",
+            },
             replica_count: 1,
             service_port: 3000,
             resources: {
@@ -65,14 +68,17 @@ export const multiDeploy = {
                 limits: { cpu: "1", memory: "1000Mi" },
             },
             env: [
-                { key: "API_URL", value: "https://orbitdeck.app/api/user" },
+                {
+                    key: "API_URL",
+                    value: "https://test.orbitdeck.app/api/user",
+                },
                 { key: "ENV", value: "development" },
                 { key: "PORT", value: "3000" },
             ],
         },
     ],
     ingress: {
-        host: "orbitdeck.app",
+        host: "test.orbitdeck.app",
     },
 };
 
