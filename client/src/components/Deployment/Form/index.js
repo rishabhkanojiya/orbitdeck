@@ -141,8 +141,12 @@ const repositories = [
     { label: "MongoDB", value: "mongodb", icon: skillIconUrls.mongodb },
     { label: "Redis", value: "redis", icon: skillIconUrls.redis },
     { label: "MySQL", value: "mysql", icon: skillIconUrls.mysql },
-    { label: "Grafana", value: "grafana", icon: skillIconUrls.grafana },
-    { label: "Sentry", value: "sentry", icon: skillIconUrls.sentry },
+    {
+        label: "Grafana",
+        value: "grafana/grafana",
+        icon: skillIconUrls.grafana,
+    },
+    // { label: "Sentry", value: "sentry", icon: skillIconUrls.sentry },
     {
         label: "RabbitMQ",
         value: "rabbitmq",
@@ -198,8 +202,12 @@ const DeploymentForm = ({ ShowPopupData }) => {
         }
     };
 
-    const { fillSimpleDeploy, fillMultiDeploy, fillMultiIngressDeploy } =
-        useTestDeployData(setValue, append, setSelectedRepo);
+    const {
+        fillSimpleDeploy,
+        fillGrafanaDeploy,
+        fillMultiDeploy,
+        fillMultiIngressDeploy,
+    } = useTestDeployData(setValue, append, setSelectedRepo);
 
     return (
         <>
@@ -294,7 +302,9 @@ const DeploymentForm = ({ ShowPopupData }) => {
                             <Label>Service Port</Label>
                             <Input
                                 type="number"
-                                {...register("ingress.servicePort")}
+                                {...register("ingress.servicePort", {
+                                    valueAsNumber: true,
+                                })}
                                 placeholder="e.g. 9069"
                             />
                         </Column>
@@ -302,6 +312,9 @@ const DeploymentForm = ({ ShowPopupData }) => {
 
                     <br />
                     <SubmitButton type="submit">🚀 Deploy Now</SubmitButton>
+                    <TestButton type="button" onClick={fillGrafanaDeploy}>
+                        ⚡ Fill Grafana Data
+                    </TestButton>
                     <TestButton type="button" onClick={fillSimpleDeploy}>
                         ⚡ Fill Dummy Data
                     </TestButton>

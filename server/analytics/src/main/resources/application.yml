@@ -13,8 +13,8 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: none
-      # ddl-auto: create
+      # ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

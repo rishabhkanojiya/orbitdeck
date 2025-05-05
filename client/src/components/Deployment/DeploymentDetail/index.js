@@ -195,7 +195,10 @@ const DeploymentDetail = ({ ShowPopupData }) => {
             await DeploymentService.uninstallDeployment({ deploymentId: id });
 
             ShowPopupData.setPopupMessageObj(
-                { message: "Deployment Uninstalled Successfully" },
+                {
+                    message:
+                        "Uninstallation of the deployment has been initiated and will complete shortly",
+                },
                 "success",
             );
             history.push("/");
