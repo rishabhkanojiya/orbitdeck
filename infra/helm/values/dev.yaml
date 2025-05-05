@@ -180,6 +180,7 @@ COMPONENT_DEFINITION:
   - &UNINSTALLER
     name: uninstall
     replicaCount: 1
+    serviceAccount: true
     image:
       repository: rishabh75/orbitdeck-uninstall
       tag: latest
