@@ -3,10 +3,10 @@ export const simpleDeploy = {
     environment: "dev",
     components: [
         {
-            name: "user",
+            name: "client",
             image: { repository: "rishabh75/sample-node", tag: "latest" },
             replica_count: 1,
-            service_port: 9069,
+            service_port: 3000,
             resources: {
                 requests: { cpu: "1", memory: "500Mi" },
                 limits: { cpu: "1", memory: "500Mi" },
@@ -18,7 +18,10 @@ export const simpleDeploy = {
         },
     ],
     ingress: {
-        host: "orbitdeck.app",
+        host: "test.orbitdeck.app",
+        // path: "/api/user/?(.*)",
+        // serviceName: "user-svc",
+        // servicePort: 3000,
     },
 };
 

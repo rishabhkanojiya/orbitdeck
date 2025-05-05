@@ -202,12 +202,8 @@ const DeploymentForm = ({ ShowPopupData }) => {
         }
     };
 
-    const {
-        fillSimpleDeploy,
-        fillGrafanaDeploy,
-        fillMultiDeploy,
-        fillMultiIngressDeploy,
-    } = useTestDeployData(setValue, append, setSelectedRepo);
+    const { fillSimpleDeploy, fillMultiDeploy, fillMultiIngressDeploy } =
+        useTestDeployData(setValue, append, setSelectedRepo);
 
     return (
         <>
@@ -312,9 +308,7 @@ const DeploymentForm = ({ ShowPopupData }) => {
 
                     <br />
                     <SubmitButton type="submit">🚀 Deploy Now</SubmitButton>
-                    <TestButton type="button" onClick={fillGrafanaDeploy}>
-                        ⚡ Fill Grafana Data
-                    </TestButton>
+
                     <TestButton type="button" onClick={fillSimpleDeploy}>
                         ⚡ Fill Dummy Data
                     </TestButton>
