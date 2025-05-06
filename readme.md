@@ -13,17 +13,17 @@
 
 ## 📚 Table of Contents
 
-- [Features](#features)
-- [Architecture Overview](#architecture-overview)
-- [Technology Stack](#technology-stack)
-- [Monorepo Structure](#monorepo-structure)
-- [Local Development](#local-development)
-- [Deployment via Terraform on Azure](#deployment-via-terraform-on-azure)
-- [API Services](#api-services)
-- [Frontend Highlights](#frontend-highlights)
-- [Modularity &amp; Extensibility](#modularity--extensibility)
-- [Screenshots](#screenshots)
-- [License](#license)
+- [Features](#-features)
+- [Architecture Overview](#-architecture-overview)
+- [Technology Stack](#-technology-stack)
+- [Monorepo Structure](#-monorepo-structure)
+- [Local Development](#-local-development)
+- [Deployment via Terraform on Azure](#-deployment-via-terraform-on-azure)
+- [API Services](#-api-services)
+- [Frontend Highlights](#-frontend-highlights)
+- [Modularity &amp; Extensibility](#-modularity--extensibility)
+- [Screenshots](#-screenshots)
+- [License](#-license)
 
 ---
 
