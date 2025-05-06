@@ -90,8 +90,13 @@
 ```bash
 # Backend (Go services)
 
+cd server/auth
+make server name=server
+
 cd server/core
-go run main.go
+make server name=server         // core service
+make server name=generate       // generate queue
+make server name=uninstall      // uninstall queue
 
 # Analytics Service
 
@@ -101,7 +106,7 @@ cd server/analytics
 # Frontend
 
 cd client
-npm install && npm run dev
+./run.sh
 ```
 
 Or use Skaffold for live sync:
