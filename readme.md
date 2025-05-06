@@ -36,7 +36,7 @@
 
 ## 🧱 Architecture Overview
 
-![Architecture](./docs/orbitdeck-architecture.png)
+![orbitdeck](https://cdn.pixelbin.io/v2/odd-flower-9c88f6/original/assets/orbitdeck.svg)
 
 ---
 
