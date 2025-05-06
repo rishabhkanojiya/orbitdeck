@@ -12,6 +12,6 @@ data:
   REDIS_ADDRESS: email-redis-svc:6379
   REDIS_ADDRESS_SPRING: redis://email-redis-svc:6379
   MIGRATION_URL: file://db/migration
-  AUTH_API_URL: https://orbitdeck.app/api/auth
-  CORE_API_URL: https://orbitdeck.app/api/core
-  ANALYTICS_API_URL: https://orbitdeck.app/api/analytics
+  AUTH_API_URL: https://orbitdeck.relise.tech/api/auth
+  CORE_API_URL: https://orbitdeck.relise.tech/api/core
+  ANALYTICS_API_URL: https://orbitdeck.relise.tech/api/analytics

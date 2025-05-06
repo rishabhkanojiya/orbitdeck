@@ -58,12 +58,29 @@ const Label = styled.label`
 
 const Input = styled.input`
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin-bottom: 16px;
     border-radius: 8px;
     border: 1px solid #333;
     background-color: ${({ theme }) => theme.colors.surface};
     color: ${({ theme }) => theme.colors.textPrimary};
+    transition: border-color 0.3s ease;
+
+    &:focus {
+        outline: none;
+        background-color: ${({ theme }) => theme.colors.surface};
+        color: ${({ theme }) => theme.colors.textPrimary};
+        border-color: ${({ theme }) => theme.colors.primary};
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+        box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.surface} inset !important;
+        -webkit-text-fill-color: ${({ theme }) =>
+            theme.colors.textPrimary} !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
 `;
 
 const AddButton = styled.button`

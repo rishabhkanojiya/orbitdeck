@@ -1,12 +1,12 @@
 export const simpleDeploy = {
-    name: "user-service",
+    name: "portfolio",
     environment: "dev",
     components: [
         {
             name: "client",
-            image: { repository: "rishabh75/sample-node", tag: "latest" },
+            image: { repository: "rishabh75/portfolio", tag: "latest" },
             replica_count: 1,
-            service_port: 3000,
+            service_port: 80,
             resources: {
                 requests: { cpu: "1", memory: "500Mi" },
                 limits: { cpu: "1", memory: "500Mi" },
@@ -18,7 +18,7 @@ export const simpleDeploy = {
         },
     ],
     ingress: {
-        host: "test.orbitdeck.app",
+        host: "portfolio.relise.tech/",
         // path: "/api/user/?(.*)",
         // serviceName: "user-svc",
         // servicePort: 3000,
@@ -73,7 +73,7 @@ export const multiDeploy = {
             env: [
                 {
                     key: "API_URL",
-                    value: "https://test.orbitdeck.app/api/user",
+                    value: "https://test.relise.tech/api/user",
                 },
                 { key: "ENV", value: "development" },
                 { key: "PORT", value: "3000" },
@@ -81,18 +81,16 @@ export const multiDeploy = {
         },
     ],
     ingress: {
-        host: "test.orbitdeck.app",
+        host: "test.relise.tech/",
     },
 };
 
 export const multiIngressDeploy = {
     ...multiDeploy,
-    ingress: [
-        {
-            host: "orbitdeck.app",
-            path: "/api/user/?(.*)",
-            serviceName: "user-svc",
-            servicePort: 9069,
-        },
-    ],
+    ingress: {
+        host: "test.relise.tech/",
+        path: "/api/user/?(.*)",
+        serviceName: "user-svc",
+        servicePort: 9069,
+    },
 };

@@ -1,6 +1,6 @@
 @hostname = localhost
 @port = 9069
-# @host = orbitdeck.app/api/auth
+# @host = orbitdeck.relise.tech/api/auth
 @host = {{hostname}}:{{port}}
 
 @contentType = application/json

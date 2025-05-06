@@ -42,6 +42,13 @@ const Title = styled.h1`
     background: ${({ theme }) => theme.colors.gradientPrimary};
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+
+    transition: ${({ theme }) => theme.transitions.default};
+
+    &:hover {
+        text-shadow: ${({ theme }) => theme.colors.glowPrimary};
+        transform: translateY(-4px);
+    }
 `;
 
 const StatusBadge = styled.span`
@@ -218,7 +225,14 @@ const DeploymentDetail = ({ ShowPopupData }) => {
                     </BackLink>
 
                     <TitleRow>
-                        <Title>{deployment?.Name}</Title>
+                        <a
+                            href={`https://${deployment?.Ingress?.[0]?.Host}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ textDecoration: "none" }}
+                        >
+                            <Title>{deployment?.Name}</Title>
+                        </a>
 
                         {polling ? (
                             <LiveStatusBadge>{`Live: ${

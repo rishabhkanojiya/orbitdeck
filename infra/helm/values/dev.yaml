@@ -220,7 +220,7 @@ INGRESS_DEFINITION: &INGRESS_DEFINITION
       nginx.ingress.kubernetes.io/use-regex: "true"
       nginx.ingress.kubernetes.io/rewrite-target: /$1
     rules:
-      - host: orbitdeck.app
+      - host: orbitdeck.relise.tech
         paths:
           - path: /api/auth/?(.*)
             pathType: ImplementationSpecific

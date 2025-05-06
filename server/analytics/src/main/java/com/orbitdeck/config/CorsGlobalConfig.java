@@ -14,7 +14,7 @@ public class CorsGlobalConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://orbitdeck.app", "https://orbitdeck.app")
+                        .allowedOrigins("http://localhost:3000", "http://orbitdeck.relise.tech", "https://orbitdeck.relise.tech")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
