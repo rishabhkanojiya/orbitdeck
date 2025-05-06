@@ -2,6 +2,13 @@
 
 **OrbitDeck** is a modern, full-stack PaaS-like platform that enables seamless deployment, management, and analytics of containerized applications using **Kubernetes**, **Helm**, **Go**, **Spring Boot**, **React**, and **Redis**. It is fully modular — each service is independently deployable and testable.
 
+<div style="position: relative; padding-bottom: 65%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+  <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+    <source src="https://cdn.pixelbin.io/v2/odd-flower-9c88f6/original/assets/orbitdeck.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 ---
 
 ## 📚 Table of Contents
